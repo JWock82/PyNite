@@ -93,6 +93,13 @@ class BeamSegZ():
 #%% 
     # Returns the shear force at a location 'x' on the segment
     def Shear(self, x):
+        """
+        Returns the value of x
+
+        Args:
+            self: (todo): write your description
+            x: (array): write your description
+        """
         
         V1 = self.V1
         w1 = self.w1
@@ -104,6 +111,13 @@ class BeamSegZ():
 #%% 
     # Returns the moment at a location on the segment
     def Moment(self, x):
+        """
+        Returns the inverse of x.
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
         
         V1 = self.V1
         M1 = self.M1
@@ -116,6 +130,13 @@ class BeamSegZ():
 #%%
     # Returns the axial force at a location on the segment
     def Axial(self, x):
+        """
+        Returns the p1p1 p1 p1 p2.
+
+        Args:
+            self: (todo): write your description
+            x: (array): write your description
+        """
         
         P1 = self.P1
         p1 = self.p1
@@ -171,6 +192,13 @@ class BeamSegZ():
 #%%
     # Returns the deflection at a location on the segment
     def Deflection(self, x):
+        """
+        Evaluate of the integral
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
         
         V1 = self.V1
         M1 = self.M1
@@ -185,6 +213,13 @@ class BeamSegZ():
 
 #%%
     def AxialDeflection(self, x):
+        """
+        Evaluates of a x - axis.
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
 
         delta_x1 = self.delta_x1
         P1 = self.P1
@@ -198,6 +233,12 @@ class BeamSegZ():
 #%%
     # Returns the maximum shear in the segment
     def MaxShear(self):
+        """
+        Returns the maximum length of the maximum length.
+
+        Args:
+            self: (todo): write your description
+        """
         
         w1 = self.w1
         w2 = self.w2
@@ -226,6 +267,12 @@ class BeamSegZ():
 #%%
     # Returns the minimum shear in the segment
     def MinShear(self):
+        """
+        Calculate of the two vector.
+
+        Args:
+            self: (todo): write your description
+        """
         
         w1 = self.w1
         w2 = self.w2
@@ -254,6 +301,12 @@ class BeamSegZ():
 #%%
     # Returns the maximum moment in the segment
     def MaxMoment(self):
+        """
+        Calculate the maximum of the maximum number of a - axis.
+
+        Args:
+            self: (todo): write your description
+        """
         
         w1 = self.w1
         w2 = self.w2
@@ -300,6 +353,12 @@ class BeamSegZ():
 #%%
     # Returns the minimum moment in the segment
     def MinMoment(self):
+        """
+        Calculate the minimum point of the line.
+
+        Args:
+            self: (todo): write your description
+        """
         
         w1 = self.w1
         w2 = self.w2
@@ -346,6 +405,12 @@ class BeamSegZ():
 #%%
     # Returns the maximum axial force in the segment
     def MaxAxial(self):
+        """
+        Finds the maximum of the maximum value.
+
+        Args:
+            self: (todo): write your description
+        """
         
         p1 = self.p1
         p2 = self.p2
@@ -374,6 +439,12 @@ class BeamSegZ():
 #%%
     # Returns the minimum axial force in the segment
     def MinAxial(self):
+        """
+        Calculate point of the rectangle.
+
+        Args:
+            self: (todo): write your description
+        """
         
         p1 = self.p1
         p2 = self. p2

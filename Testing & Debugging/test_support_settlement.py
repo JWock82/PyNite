@@ -20,14 +20,32 @@ class Test_Support_Settlement(unittest.TestCase):
     ''' Test for support settlements. '''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
 
     def test_support_settlement(self):
+        """
+        Test if all the available to see https : // www. python 3.
+
+        Args:
+            self: (todo): write your description
+        """
         beam = FEModel3D()
         # Add nodes
         beam.AddNode('A', 0, 0, 0)

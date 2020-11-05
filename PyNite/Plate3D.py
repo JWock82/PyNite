@@ -7,6 +7,23 @@ class Plate3D():
 
     def __init__(self, Name, iNode, jNode, mNode, nNode, t, E, nu,
                  LoadCombos={'Combo 1':LoadCombo('Combo 1', factors={'Case 1':1.0})}):
+        """
+        Initialize a node
+
+        Args:
+            self: (todo): write your description
+            Name: (str): write your description
+            iNode: (todo): write your description
+            jNode: (todo): write your description
+            mNode: (todo): write your description
+            nNode: (todo): write your description
+            t: (int): write your description
+            E: (int): write your description
+            nu: (int): write your description
+            LoadCombos: (todo): write your description
+            LoadCombo: (todo): write your description
+            factors: (float): write your description
+        """
 
         self.Name = Name
         self.ID = None
@@ -24,13 +41,31 @@ class Plate3D():
         self.LoadCombos = LoadCombos
     
     def width(self):
+        """
+        Returns the width of the element
+
+        Args:
+            self: (todo): write your description
+        """
         return ((self.jNode.X - self.iNode.X)**2 + (self.jNode.Y - self.iNode.Y)**2 + (self.jNode.Z - self.iNode.Z)**2)**0.5
 
     def height(self):
+        """
+        Return the height of the element.
+
+        Args:
+            self: (todo): write your description
+        """
         return ((self.nNode.X - self.iNode.X)**2 + (self.nNode.Y - self.iNode.Y)**2 + (self.nNode.Z - self.iNode.Z)**2)**0.5
 
     # Creates the local stiffness matrix
     def k(self):
+        """
+        Return the k - style of the k_b.
+
+        Args:
+            self: (todo): write your description
+        """
         return add(self.k_b(), self.k_m())
     
     def k_b(self):
@@ -276,6 +311,13 @@ class Plate3D():
 
 #%%
     def F(self, combo_name='Combo 1'):
+        """
+        Compute the matrix of the matrix.
+
+        Args:
+            self: (todo): write your description
+            combo_name: (str): write your description
+        """
         
         # Calculate and return the global force vector
         return matmul(inv(self.T()), self.f(combo_name))
@@ -324,6 +366,12 @@ class Plate3D():
 #%%  
     # Transformation matrix
     def T(self):
+        """
+        Return the t as a t
+
+        Args:
+            self: (todo): write your description
+        """
 
         # Calculate the direction cosines for the local x-axis
         # The local x-axis will run from the i-node to the j-node
@@ -374,6 +422,12 @@ class Plate3D():
 #%%
     # Plate global stiffness matrix
     def K(self):
+        """
+        Compute the transpose.
+
+        Args:
+            self: (todo): write your description
+        """
         
         # Calculate and return the stiffness matrix in global coordinates
         return matmul(matmul(transpose(self.T()), self.k()), self.T())
@@ -397,6 +451,12 @@ class Plate3D():
 #%%
     # Calculates and returns the displacement coefficient matrix [C]
     def __C(self):
+        """
+        Returns a :
+
+        Args:
+            self: (todo): write your description
+        """
 
         # Find the local x and y coordinates at each node
         xi = 0
@@ -431,6 +491,14 @@ class Plate3D():
 #%%
     # Calculates and returns the plate curvature coefficient matrix [Q] at a given point (x, y) in the plate's local system
     def __Q(self, x, y):
+        """
+        Returns the y x y
+
+        Args:
+            self: (todo): write your description
+            x: (int): write your description
+            y: (int): write your description
+        """
 
         # Calculate the [Q] coefficient matrix
         Q = matrix([[0, 0, 0, -2, 0, 0, -6*x, -2*y, 0, 0, -6*x*y, 0],
@@ -520,6 +588,15 @@ class Plate3D():
 
 #%%
     def membrane(self, x, y, combo_name='Combo 1'):
+        """
+        Calculate the membrane of a memory.
+
+        Args:
+            self: (todo): write your description
+            x: (array): write your description
+            y: (array): write your description
+            combo_name: (str): write your description
+        """
 
         # Get the plate's local displacement vector
         # Slice out terms not related to membrane forces

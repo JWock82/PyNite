@@ -16,14 +16,32 @@ class Test_Plates(unittest.TestCase):
     ''' Tests of analyzing plate elements. '''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
 
     def test_plate_displacement(self):
+        """
+        Displacement are allowed.
+
+        Args:
+            self: (todo): write your description
+        """
         # A First Course in the Finite Element Method, 4th Edition
         # Daryl L. Logan
         # Example 12.1

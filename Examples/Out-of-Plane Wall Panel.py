@@ -17,6 +17,22 @@ class RectWall():
 
     # Constructor
     def __init__(self, width, height, thickness, E=3824, nu=0.3, mesh_size=1, bot_support='Pinned', top_support='Pinned', left_support='Free', right_support='Free'):
+        """
+        Initialize a mesh.
+
+        Args:
+            self: (todo): write your description
+            width: (int): write your description
+            height: (int): write your description
+            thickness: (todo): write your description
+            E: (int): write your description
+            nu: (int): write your description
+            mesh_size: (int): write your description
+            bot_support: (int): write your description
+            top_support: (int): write your description
+            left_support: (int): write your description
+            right_support: (int): write your description
+        """
 
         self.width = width
         self.height = height
@@ -41,6 +57,16 @@ class RectWall():
     
     # Adds a pressure load to the wall
     def add_load(self, y_bot, y_top, p_bot, p_top):
+        """
+        Add a load to the topology.
+
+        Args:
+            self: (todo): write your description
+            y_bot: (str): write your description
+            y_top: (str): write your description
+            p_bot: (str): write your description
+            p_top: (str): write your description
+        """
         
         # Add the load to the wall
         self.loads.append((y_bot, y_top, p_bot, p_top))
@@ -48,6 +74,12 @@ class RectWall():
     
     # Removes all loads from the wall
     def clear_loads(self):
+        """
+        Clears all files from the database.
+
+        Args:
+            self: (todo): write your description
+        """
 
         # Clear all the wall loads
         self.loads = []
@@ -56,6 +88,12 @@ class RectWall():
     
     # Descritizes the wall
     def __descritize(self):
+        """
+        Descriting description.
+
+        Args:
+            self: (todo): write your description
+        """
 
         # Determine how many columns of plates are necessary
         num_cols = round(self.width/self.mesh_size)
@@ -138,6 +176,12 @@ class RectWall():
 
     # Defines support conditions at each node
     def __define_supports(self):
+        """
+        Check whether or notclose is true if there.
+
+        Args:
+            self: (todo): write your description
+        """
 
         # Step through each node in the model
         for node in self.fem.Nodes:
@@ -170,6 +214,12 @@ class RectWall():
 
     # Analyzes the wall
     def analyze(self):
+        """
+        Analyze the network
+
+        Args:
+            self: (todo): write your description
+        """
 
         # Descritize the wall
         self.__descritize()
@@ -325,6 +375,12 @@ class RectWall():
         plt.show()
 
     def plot_disp(self):
+        """
+        Plots the 2d plot
+
+        Args:
+            self: (todo): write your description
+        """
         
         # Determine the total number of nodes in the wall
         num_nodes = len(self.fem.Nodes)

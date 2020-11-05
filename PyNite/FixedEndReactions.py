@@ -84,6 +84,17 @@ def FER_Moment(M, x, L, Direction):
 # %%
 # Returns the fixed end reaction vector for a linear distributed load
 def FER_LinLoad(w1, w2, x1, x2, L, Direction):
+    """
+    R calculates the coefficient of a liquid in [ 2 ] _1.
+
+    Args:
+        w1: (str): write your description
+        w2: (str): write your description
+        x1: (str): write your description
+        x2: (str): write your description
+        L: (str): write your description
+        Direction: (str): write your description
+    """
         
     # Create the fixed end reaction vector
     FER = zeros((12, 1))
@@ -105,6 +116,14 @@ def FER_LinLoad(w1, w2, x1, x2, L, Direction):
 # %%
 # Returns the fixed end reaction vector for an axial point load
 def FER_AxialPtLoad(P, x, L):
+    """
+    R calculates the value of a pipe pt
+
+    Args:
+        P: (todo): write your description
+        x: (todo): write your description
+        L: (todo): write your description
+    """
     
     # Create the fixed end reaction vector
     FER = zeros((12, 1))
@@ -118,6 +137,16 @@ def FER_AxialPtLoad(P, x, L):
 # %%
 # Returns the fixed end reaction vector for a distributed axial load
 def FER_AxialLinLoad(p1, p2, x1, x2, L):
+    """
+    Calculate the adjustment of two - phase
+
+    Args:
+        p1: (str): write your description
+        p2: (str): write your description
+        x1: (str): write your description
+        x2: (str): write your description
+        L: (str): write your description
+    """
     
     # Create the fixed end reaction vector
     FER = zeros((12, 1))

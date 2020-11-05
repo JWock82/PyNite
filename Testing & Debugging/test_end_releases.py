@@ -15,14 +15,32 @@ class Test_End_Release(unittest.TestCase):
     ''' Test member end releases. '''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
 
     def test_end_release_Rz(self):
+        """
+        R calculate the end of model
+
+        Args:
+            self: (todo): write your description
+        """
         myModel = FEModel3D()
         # Add two supported nodes and one member
         myModel.AddNode('N1', 0, 0, 0)

@@ -14,14 +14,32 @@ class Test_Unstable(unittest.TestCase):
     ''' Tests that should raise instability errors.'''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
         
     def test_unstable_supports(self):    
+        """
+        Test if the test is unstable test.
+
+        Args:
+            self: (todo): write your description
+        """
         # This test checks the PyNite's ability to detect unstable support conditions
         # Units used in this test are inches, and kips
         MomentFrame = FEModel3D()

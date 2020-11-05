@@ -60,6 +60,13 @@ class BeamSegY(BeamSegZ):
 #%%
     # Returns the deflection at a location on the segment
     def Deflection(self, x):
+        """
+        Evaluate of a x and b.
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
         
         V1 = self.V1
         M1 = self.M1
@@ -76,6 +83,12 @@ class BeamSegY(BeamSegZ):
 #%%
     # Returns the maximum moment in the segment
     def MaxMoment(self):
+        """
+        Calculate the maximum of the maximum number of a - axis.
+
+        Args:
+            self: (todo): write your description
+        """
         
         w1 = self.w1
         w2 = self.w2
@@ -122,6 +135,12 @@ class BeamSegY(BeamSegZ):
 #%%
     # Returns the minimum moment in the segment
     def MinMoment(self):
+        """
+        Calculate the minimum point of the line.
+
+        Args:
+            self: (todo): write your description
+        """
         
         w1 = self.w1
         w2 = self.w2

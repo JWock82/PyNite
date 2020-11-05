@@ -19,6 +19,23 @@ class Quad3D():
 #%%
     def __init__(self, Name, iNode, jNode, mNode, nNode, t, E, nu,
                  LoadCombos={'Combo 1':LoadCombo('Combo 1', factors={'Case 1':1.0})}):
+        """
+        Initialize a node
+
+        Args:
+            self: (todo): write your description
+            Name: (str): write your description
+            iNode: (todo): write your description
+            jNode: (todo): write your description
+            mNode: (todo): write your description
+            nNode: (todo): write your description
+            t: (int): write your description
+            E: (int): write your description
+            nu: (int): write your description
+            LoadCombos: (todo): write your description
+            LoadCombo: (todo): write your description
+            factors: (float): write your description
+        """
 
         self.Name = Name
         self.ID = None
@@ -90,6 +107,14 @@ class Quad3D():
 
 #%%
     def B_kappa(self, r, s):
+        """
+        Compute the kappa matrix of - kappa
+
+        Args:
+            self: (todo): write your description
+            r: (todo): write your description
+            s: (todo): write your description
+        """
 
         # Differentiate the interpolation functions
         # Row 1 = interpolation functions differentiated with respect to x
@@ -194,6 +219,14 @@ class Quad3D():
 
 #%%
     def B_m(self, r, s):
+        """
+        Compute the matrix r^2 matrix r.
+
+        Args:
+            self: (todo): write your description
+            r: (int): write your description
+            s: (int): write your description
+        """
 
         # Differentiate the interpolation functions
         # Row 1 = interpolation functions differentiated with respect to x
@@ -817,6 +850,15 @@ class Quad3D():
 
 #%%
     def membrane(self, r=0, s=0, combo_name='Combo 1'):
+        """
+        Compute the memory of a membrane.
+
+        Args:
+            self: (todo): write your description
+            r: (array): write your description
+            s: (array): write your description
+            combo_name: (str): write your description
+        """
         
         # Get the plate's local displacement vector
         # Slice out terms not related to membrane forces

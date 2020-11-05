@@ -481,6 +481,16 @@ def __DeformedShape(model, renderer, scale_factor, text_height, combo_name):
 
 #%%
 def __RenderLoads(model, renderer, text_height, combo_name, case):
+    """
+    Load all available models.
+
+    Args:
+        model: (str): write your description
+        renderer: (todo): write your description
+        text_height: (str): write your description
+        combo_name: (str): write your description
+        case: (todo): write your description
+    """
 
   # Get the maximum load magnitudes that will be used to normalize the display scale
   maxPtLoad, maxMoment, maxDistLoad = __MaxLoads(model, combo_name, case)
@@ -640,6 +650,14 @@ def __RenderLoads(model, renderer, text_height, combo_name, case):
 
 #%%
 def __MaxLoads(model, combo_name=None, case=None):
+    """
+    Recursively load the factors of the models.
+
+    Args:
+        model: (todo): write your description
+        combo_name: (str): write your description
+        case: (str): write your description
+    """
 
   maxPtLoad = 0
   maxMoment = 0
@@ -744,6 +762,15 @@ class VisNode():
 
   # Constructor
   def __init__(self, node, text_height=5, color=None):
+      """
+      Initialize a vtkactor.
+
+      Args:
+          self: (todo): write your description
+          node: (todo): write your description
+          text_height: (str): write your description
+          color: (bool): write your description
+      """
 
     # Create an append filter to append all the sources related to the node into a single 'PolyData' object
     self.polydata = vtk.vtkAppendPolyData()
@@ -1067,6 +1094,15 @@ class VisNode():
 class VisSpring():
     
     def __init__(self, spring, nodes, text_height=5):
+        """
+        Initialize a vtkactor.
+
+        Args:
+            self: (todo): write your description
+            spring: (todo): write your description
+            nodes: (list): write your description
+            text_height: (str): write your description
+        """
     
         # Generate a line source for the spring
         line = vtk.vtkLineSource()
@@ -1118,6 +1154,15 @@ class VisMember():
 
   # Constructor
   def __init__(self, member, nodes, text_height=5):
+      """
+      Initialize a vtkactor.
+
+      Args:
+          self: (todo): write your description
+          member: (todo): write your description
+          nodes: (list): write your description
+          text_height: (str): write your description
+      """
 
     # Generate a line for the member
     line = vtk.vtkLineSource()
@@ -1167,6 +1212,15 @@ class VisPlate():
 
   # Constructor
   def __init__(self, plate, nodes, text_height=5):
+      """
+      Creates a vtkvtk.
+
+      Args:
+          self: (todo): write your description
+          plate: (todo): write your description
+          nodes: (list): write your description
+          text_height: (str): write your description
+      """
 
     # Generate lines for the plate
     line1 = vtk.vtkLineSource()
@@ -1262,6 +1316,16 @@ class VisPlate():
 class VisDeformedNode():
     
   def __init__(self, node, scale_factor, text_height=5, combo_name='Combo 1'):
+      """
+      Initialize a vtkactor.
+
+      Args:
+          self: (todo): write your description
+          node: (todo): write your description
+          scale_factor: (array): write your description
+          text_height: (str): write your description
+          combo_name: (str): write your description
+      """
         
     # Calculate the node's deformed position
     newX = node.X + scale_factor*(node.DX[combo_name])
@@ -1295,6 +1359,17 @@ class VisDeformedMember():
     
   def __init__(self, member, nodes, scale_factor, text_height=5,
                combo_name='Combo 1'):
+      """
+      Initialize the plot.
+
+      Args:
+          self: (todo): write your description
+          member: (todo): write your description
+          nodes: (list): write your description
+          scale_factor: (array): write your description
+          text_height: (str): write your description
+          combo_name: (str): write your description
+      """
         
     # Determine if this member is active for each load combination
     self.active = member.active
@@ -1376,6 +1451,17 @@ class VisDeformedSpring():
     
     def __init__(self, spring, nodes, scale_factor, text_height=5, 
                  combo_name='Combo 1'):
+        """
+        Initializes a actor from a vtkactor.
+
+        Args:
+            self: (todo): write your description
+            spring: (todo): write your description
+            nodes: (list): write your description
+            scale_factor: (array): write your description
+            text_height: (str): write your description
+            combo_name: (str): write your description
+        """
 
         # Determine if this spring is active for each load combination
         self.active = spring.active

@@ -14,14 +14,32 @@ class Test_AxialLoads(unittest.TestCase):
     ''' Tests of member axial loads.'''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
         
     def test_axial_distributed_load(self):    
+        """
+        This function to load of the axes of - axes.
+
+        Args:
+            self: (todo): write your description
+        """
         # Units N e m
         Beam = FEModel3D()
         L = 5 # m

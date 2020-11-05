@@ -15,14 +15,32 @@ class Test_2D_Frame(unittest.TestCase):
     ''' Tests of analyzing 2D frames. '''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
 
     def test_XY_gravity_load(self):
+        """
+        This function is called when the load is loaded load balancer.
+
+        Args:
+            self: (todo): write your description
+        """
         # A First Course in the Finite Element Method, 4th Edition
         # Daryl L. Logan
         # Problem 5.30
@@ -72,6 +90,12 @@ class Test_2D_Frame(unittest.TestCase):
                 self.assertAlmostEqual(node.RxnMZ['Combo 1']/values['RxnMZ'], 1.0, 2)
 
     def test_XY_member_ptload(self):
+        """
+        Determine the member of the current member.
+
+        Args:
+            self: (todo): write your description
+        """
         frame = FEModel3D()
         # Add nodes
         frame.AddNode('N1', 0, 0, 0)        # ft
@@ -103,6 +127,12 @@ class Test_2D_Frame(unittest.TestCase):
         self.assertAlmostEqual(calculated_RZ/expected_RZ, 1.0, 2)
     
     def test_YZ_gravity_load(self):
+        """
+        This function is called when the load is loaded from i.
+
+        Args:
+            self: (todo): write your description
+        """
         # A First Course in the Finite Element Method, 4th Edition
         # Daryl L. Logan
         # Problem 5.30
@@ -165,6 +195,12 @@ class Test_2D_Frame(unittest.TestCase):
                 self.assertAlmostEqual(node.RX['Combo 1']/values['RX'], 1.0, 2)
 
     def test_XZ_ptload(self):
+        """
+        Evaluates the x and y points.
+
+        Args:
+            self: (todo): write your description
+        """
         # A simply supported beam with a point load.
         # Units used in this example are inches, and kips
         SimpleBeam = FEModel3D()

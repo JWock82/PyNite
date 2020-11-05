@@ -15,14 +15,32 @@ class Test_End_Release(unittest.TestCase):
     ''' Test torsion loads. '''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
 
     def test_member_torque_load(self):
+        """
+        Determine the member of the member.
+
+        Args:
+            self: (todo): write your description
+        """
         TorqueBeam = FEModel3D()
         # Add nodes (14 ft = 168 in apart)
         TorqueBeam.AddNode('N1', 0, 0, 0)

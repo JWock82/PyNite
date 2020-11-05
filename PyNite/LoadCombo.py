@@ -4,6 +4,15 @@ class LoadCombo():
     '''
 
     def __init__(self, name, combo_type=None, factors={}):
+        """
+        Initialize a new factors object.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            combo_type: (todo): write your description
+            factors: (float): write your description
+        """
         
         self.name = name             # A unique user-defined name for the load combination
         self.combo_type = combo_type # Used to track what type of load combination (e.g. strength or serviceability)

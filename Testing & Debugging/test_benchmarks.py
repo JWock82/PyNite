@@ -16,14 +16,32 @@ class Test_AISC_Benchmark(unittest.TestCase):
     procedure is rigorous enough.'''
 
     def setUp(self):
+        """
+        Sets the program to stdout.
+
+        Args:
+            self: (todo): write your description
+        """
         # Suppress printed output temporarily
         sys.stdout = StringIO()
 
     def tearDown(self):
+        """
+        Tear down the terminal.
+
+        Args:
+            self: (todo): write your description
+        """
         # Reset the print function to normal
         sys.stdout = sys.__stdout__
 
     def test_AISC_Benckmark(self):
+        """
+        Calculate aISCckmarkmarkmark.
+
+        Args:
+            self: (todo): write your description
+        """
         # Create the cantilever model
         cantilever = FEModel3D()
 

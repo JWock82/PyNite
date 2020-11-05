@@ -441,6 +441,12 @@ class Member3D():
 #%%
     # Member global stiffness matrix
     def K(self):
+        """
+        Compute the transpose.
+
+        Args:
+            self: (todo): write your description
+        """
         
         # Calculate and return the stiffness matrix in global coordinates
         return matmul(matmul(transpose(self.T()), self.k()), self.T())
@@ -448,6 +454,13 @@ class Member3D():
 #%%
     # Member global geometric stiffness matrix
     def Kg(self, P=0):
+        """
+        Return the superposition matrix.
+
+        Args:
+            self: (todo): write your description
+            P: (int): write your description
+        """
         
         # Calculate and return the geometric stiffness matrix in global coordinates
         return matmul(matmul(transpose(self.T()), self.kg(P)), self.T())
@@ -1364,6 +1377,13 @@ class Member3D():
 #%%    
     # Divides the element up into mathematically continuous segments along each axis
     def SegmentMember(self, combo_name='Combo 1'):
+        """
+        A method that creates a member of the member
+
+        Args:
+            self: (todo): write your description
+            combo_name: (str): write your description
+        """
         
         # Get the member's length and stiffness properties
         L = self.L()
