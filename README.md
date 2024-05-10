@@ -61,6 +61,9 @@ Here's a list of projects that use PyNite:
 * Phaenotyp (https://github.com/bewegende-Architektur/Phaenotyp) (https://youtu.be/shloSw9HjVI)
 
 # What's New?
+v0.0.95
+* Bug fix for rendering negative point loads via `Pyvista`. They were being rendered as positive loads. The analysis was not impacted by this bug.
+
 v0.0.94
 * Added rendering via `Pyvista`. This greatly simplified the rendering code and provided a fresh look to the rendereings. Renderings in jupyter are now interactive. Global axes are also now shown in rendereings. To use `Pyvista` instead of `VTK`, use the new `Rendering` library rather than the old `Visualization` library. Rendering via `VTK` directly is still available.
 * Bug fix for member self-weight. The program was throwing exceptions instead of calculating member self-weight. Added a unit test to help prevent this issue from occuring again as code changes.
@@ -81,31 +84,3 @@ v0.0.88
 
 v0.0.87
 * Fine-tuned P-$\delta$ effects. P-$\delta$ effects are now included in member internal slope and deflection calculations.
-
-v0.0.85
-* Changed member moment diagrams to no longer include P-little-delta effects in non-P-Delta analyses. This leads to consistent moment diagrams across members for simple analysis methods. Before, even when P-Delta effects weren't being calculated, P-little-delta effects were included in member moment diagrams, leading to member moment diagrams that didn't quite match up across joints on non-P-Delta models with significant P-Delta effects.
-
-v0.0.83 & v0.0.84
-* Fixed a bug in P-Delta analysis member moment calculations. Global results were correct, but member internal moments were neglecting the P-little delta effect. The result was correct moments at nodal locations, but incorrect results in between. This issue has been resolved.
-
-v0.0.82
-* `Sections` have been introduced to allow for member stresses to be tracked by the program during nonlinear analysis in the future. This opens the door for other useful features down the line too. Use of `Sections` is optional, and will only required for pushover analysis when that feature is implemented. You do not need to use this feature yet.
-* P-Delta analysis code has been greatly simplified. Performance has also been improved, as redundant iterations are no longer being performed. Removed the `tol` parameter as it is unecessary when using a geometric stiffness matrix instead of an iterative procedure.
-* Better documentation for P-Delta analysis.
-* Corrections to unit tests that weren't working properly. Added another AISC Benchmark unit test for P-Delta analysis. This should help safeguard the program against some types of bugs being introduced going forward.
-* Bug fix for multiple support springs at a single node. When calculating reactions, the program was only considering the effects of one spring at the node, whichever came first in this list: DX, DY, DZ, RX, RY, RZ. This only affected reaction calculations, and has been remedied.
-* Bug fix for mesh max/min results. The program was throwing exceptions when the user requested results from the mesh rather than the elements themselves.
-* Work has begun on nonlinear pushover analysis. This has proven to be a challenging feature to implement, and still has a long way to go. However, in the process of working on pushover analaysis several inneficiencies in the analysis code were identified and fixed. This update includes those changes, and brings the "work-in-progress" pushover code into the main branch of the project. The  pushover branch into to the main branch because critical parts of the analysis code were diverging from the main branch, making it harder to accept pull requests from other users.
-
-v0.0.80
-* Refactored/simplified analysis code. Much of it has been moved to a new `Analysis` file that eliminated redundant code.
-* Load combination tags have replaced `combo_type`. You can now use a list of tags to tag your load combinations for easier categorization.
-* You no longer have to run all load combinations. You can now run select combos based on their tags.
-* Started basic documentation for plates.
-
-v0.0.79
-* Added the option to turn off nodes during visualization.
-* Bug fix for meshing cylinders about the global X or Z axis.
-
-v0.0.78
-* Corrections to tension/compression only support springs. v0.0.76 and v0.0.77 were not working as expected. 3rd time's a charm.

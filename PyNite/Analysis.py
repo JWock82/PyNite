@@ -125,7 +125,7 @@ def _check_stability(model, K):
     return
 
 def _PDelta_step(model, combo_name, P1, FER1, D1_indices, D2_indices, D2, log=True, sparse=True, check_stability=False, max_iter=30, first_step=True):
-    """Performs second order (P-Delta) analysis. This type of analysis is appropriate for most models using beams, columns and braces. Second order analysis is usually required by material specific codes. The analysis is iterative and takes longer to solve. Models with slender members and/or members with combined bending and axial loads will generally have more significant P-Delta effects. P-Delta effects in plates/quads are not considered.
+    """Performs second order (P-Delta) analysis. This type of analysis is appropriate for most models using beams, columns and braces. Second order analysis is usually required by material-specific codes. The analysis is iterative and takes longer to solve. Models with slender members and/or members with combined bending and axial loads will generally have more significant P-Delta effects. P-Delta effects in plates/quads are not considered.
 
     :param combo_name: The name of the load combination to evaluate P-Delta effects for.
     :type combo_name: string
@@ -144,6 +144,7 @@ def _PDelta_step(model, combo_name, P1, FER1, D1_indices, D2_indices, D2, log=Tr
     :raises ValueError: Occurs when there is a singularity in the stiffness matrix, which indicates an unstable structure.
     :raises Exception: Occurs when a model fails to converge.
     """
+
     # Import `scipy` features if the sparse solver is being used
     if sparse == True:
         from scipy.sparse.linalg import spsolve

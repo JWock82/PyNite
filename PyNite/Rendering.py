@@ -1295,6 +1295,13 @@ def _PrepContour(model, stress_type='Mx', combo_name='Combo 1'):
                 node.contour = sum(node.contour)/len(node.contour)
 
 def sig_fig_round(number, sig_figs):
+    # Check for strings or other convertible data types
+    if not isinstance(number, (float, int)):
+        try:
+            number = float(number)
+        except:
+            raise ValueError(f"{number} is not a number. Ensure that all labels are numeric.")
+
     if number == 0:
         return 0
 
