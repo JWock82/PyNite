@@ -101,17 +101,20 @@ class Mesh():
         Parameters
         ----------
         direction : string, optional
-            The direction to ge the maximum shear for. Options are 'Qx' or 'Qy'. Default
-            is 'Qx'.
+            The direction to ge the maximum shear for. Options are 'Qx', 'Qy', 'QX', or 'QY'. Default is 'Qx'.
         combo : string, optional
             The name of the load combination to get the maximum shear for. If omitted, all load
             combinations will be evaluated.
         """
 
-        if direction == 'Qx':
+        if direction == 'Qx' or direction == 'QX':
             i = 0
-        elif direction == 'Qy':
+            if direction == 'QX':
+                local = False
+        elif direction == 'Qy' or direction == 'QY':
             i = 1
+            if direction == 'QY':
+                local = False
         else:
             raise Exception('Invalid direction specified for mesh shear results. Valid values are \'Qx\', or \'Qy\'')
 
@@ -143,11 +146,11 @@ class Mesh():
                     
                     # Find the maximum shear in the element, checking each corner and the center
                     # of the element
-                    Q_element = max([element.shear(xi, yi, load_combo.name)[i, 0],
-                                     element.shear(xj, yj, load_combo.name)[i, 0],
-                                     element.shear(xm, ym, load_combo.name)[i, 0],
-                                     element.shear(xn, yn, load_combo.name)[i, 0],
-                                     element.shear((xi + xj)/2, (yi + yn)/2, load_combo.name)[i, 0]])
+                    Q_element = max([element.shear(xi, yi, local, load_combo.name)[i, 0],
+                                     element.shear(xj, yj, local, load_combo.name)[i, 0],
+                                     element.shear(xm, ym, local, load_combo.name)[i, 0],
+                                     element.shear(xn, yn, local, load_combo.name)[i, 0],
+                                     element.shear((xi + xj)/2, (yi + yn)/2, local, load_combo.name)[i, 0]])
 
                     # Determine if the maximum shear calculated is the largest encountered so far
                     if Q_max == None or Q_max < Q_element:
@@ -167,19 +170,22 @@ class Mesh():
         Parameters
         ----------
         direction : string, optional
-            The direction to ge the minimum shear for. Options are 'Qx' or 'Qy'. Default
-            is 'Qx'.
+            The direction to ge the minimum shear for. Options are 'Qx', 'Qy', 'QX', or 'QY'. Default is 'Qx'.
         combo : string, optional
             The name of the load combination to get the minimum shear for. If omitted, all load
             combinations will be evaluated.
         """
 
-        if direction == 'Qx':
+        if direction == 'Qx' or direction == 'QX':
             i = 0
-        elif direction == 'Qy':
+            if direction == 'QX':
+                local = False
+        elif direction == 'Qy' or direction == 'QY':
             i = 1
+            if direction == 'QY':
+                local = False
         else:
-            raise Exception('Invalid direction specified for mesh shear results. Valid values are \'Qx\', or \'Qy\'')
+            raise Exception('Invalid direction specified for mesh shear results. Valid values are \'Qx\', \'Qy\', \'QX\', or \'QY\'')
 
         # Initialize the minimum value to None
         Q_min = None
@@ -209,11 +215,11 @@ class Mesh():
                     
                     # Find the minimum shear in the element, checking each corner and the center
                     # of the element
-                    Q_element = min([element.shear(xi, yi, load_combo.name)[i, 0],
-                                     element.shear(xj, yj, load_combo.name)[i, 0],
-                                     element.shear(xm, ym, load_combo.name)[i, 0],
-                                     element.shear(xn, yn, load_combo.name)[i, 0],
-                                     element.shear((xi + xj)/2, (yi + yn)/2, load_combo.name)[i, 0]])
+                    Q_element = min([element.shear(xi, yi, local, load_combo.name)[i, 0],
+                                     element.shear(xj, yj, local, load_combo.name)[i, 0],
+                                     element.shear(xm, ym, local, load_combo.name)[i, 0],
+                                     element.shear(xn, yn, local, load_combo.name)[i, 0],
+                                     element.shear((xi + xj)/2, (yi + yn)/2, local, load_combo.name)[i, 0]])
 
                     # Determine if the minimum shear calculated is the smallest encountered so far
                     if Q_min == None or Q_min > Q_element:
@@ -233,21 +239,25 @@ class Mesh():
         Parameters
         ----------
         direction : string, optional
-            The direction to ge the maximum moment for. Options are 'Mx', 'My', or 'Mxy'. Default
-            is 'Mx'.
+            The direction to ge the maximum moment for. Options are 'Mx', 'My', 'Mxy', 'MX', or 'MY'. Default is 'Mx'.
         combo : string, optional
             The name of the load combination to get the maximum moment for. If omitted, all load
             combinations will be evaluated.
         """
 
-        if direction == 'Mx':
+        if direction == 'Mx' or direction == 'MX':
             i = 0
-        elif direction == 'My':
+            if direction == 'MX':
+                local = False
+        elif direction == 'My' or direction == 'MY':
             i = 1
+            if direction == 'MY':
+                local = False
         elif direction == 'Mxy':
             i = 2
+            local = True
         else:
-            raise Exception('Invalid direction specified for mesh moment results. Valid values are \'Mx\', \'My\', or \'Mxy\'')
+            raise Exception('Invalid direction specified for mesh moment results. Valid values are \'Mx\', \'My\', \'Mxy\', \'MX\' or \'MY\'')
 
         # Initialize the maximum value to None
         M_max = None
@@ -277,11 +287,11 @@ class Mesh():
                     
                     # Find the maximum moment in the element, checking each corner and the center
                     # of the element
-                    M_element = max([element.moment(xi, yi, load_combo.name)[i, 0],
-                                     element.moment(xj, yj, load_combo.name)[i, 0],
-                                     element.moment(xm, ym, load_combo.name)[i, 0],
-                                     element.moment(xn, yn, load_combo.name)[i, 0],
-                                     element.moment((xi + xj)/2, (yi + yn)/2, load_combo.name)[i, 0]])
+                    M_element = max([element.moment(xi, yi, local, load_combo.name)[i, 0],
+                                     element.moment(xj, yj, local, load_combo.name)[i, 0],
+                                     element.moment(xm, ym, local, load_combo.name)[i, 0],
+                                     element.moment(xn, yn, local, load_combo.name)[i, 0],
+                                     element.moment((xi + xj)/2, (yi + yn)/2, local, load_combo.name)[i, 0]])
 
                     # Determine if the maximum moment calculated is the largest encountered so far
                     if M_max == None or M_max < M_element:
@@ -308,14 +318,19 @@ class Mesh():
             combinations will be evaluated.
         """
 
-        if direction == 'Mx':
+        if direction == 'Mx' or direction == 'MX':
             i = 0
-        elif direction == 'My':
+            if direction == 'MX':
+                local = False
+        elif direction == 'My' or direction == 'MY':
             i = 1
+            if direction == 'MY':
+                local = False
         elif direction == 'Mxy':
             i = 2
+            local = True
         else:
-            raise Exception('Invalid direction specified for mesh moment results. Valid values are \'Mx\', \'My\', or \'Mxy\'')
+            raise Exception('Invalid direction specified for mesh moment results. Valid values are \'Mx\', \'My\', \'Mxy\', \'MX\', \'MY\'')
 
         # Initialize the minimum value to None
         M_min = None
@@ -345,11 +360,11 @@ class Mesh():
                     
                     # Find the minimum moment in the element, checking each corner and the center
                     # of the element
-                    M_element = min([element.moment(xi, yi, load_combo.name)[i, 0],
-                                     element.moment(xj, yj, load_combo.name)[i, 0],
-                                     element.moment(xm, ym, load_combo.name)[i, 0],
-                                     element.moment(xn, yn, load_combo.name)[i, 0],
-                                     element.moment((xi + xj)/2, (yi + yn)/2, load_combo.name)[i, 0]])
+                    M_element = min([element.moment(xi, yi, local, load_combo.name)[i, 0],
+                                     element.moment(xj, yj, local, load_combo.name)[i, 0],
+                                     element.moment(xm, ym, local, load_combo.name)[i, 0],
+                                     element.moment(xn, yn, local, load_combo.name)[i, 0],
+                                     element.moment((xi + xj)/2, (yi + yn)/2, local, load_combo.name)[i, 0]])
 
                     # Determine if the minimum moment calculated is the smallest encountered so far
                     if M_min == None or M_min > M_element:
