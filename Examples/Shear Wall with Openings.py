@@ -88,7 +88,7 @@ model.analyze(log=True, check_statics=True)
 from PyNite.Rendering import Renderer
 renderer = Renderer(model)
 renderer.combo_name = 'Seismic'
-renderer.color_map = 'Txy'
+renderer.color_map = 'SX'
 renderer.annotation_size = 1
 renderer.deformed_shape = True
 renderer.deformed_scale = 200

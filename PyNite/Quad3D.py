@@ -3,7 +3,7 @@
 # 2. "A First Course in the Finite Element Method, 4th Edition", Daryl L. Logan
 # 3. "Finite Element Analysis Fundamentals", Richard H. Gallagher
 
-from numpy import array, arccos, dot, cross, matmul, add, zeros
+import numpy as np
 from numpy.linalg import inv, det, norm
 from math import sin, cos
 
@@ -66,28 +66,28 @@ class Quad3D():
         # Following Reference 1, Figure 5.26, node 3 will be used as the
         # origin of the plate's local (x, y) coordinate system. Find the
         # vector from the origin to each node.
-        vector_32 = array([X2 - X3, Y2 - Y3, Z2 - Z3]).T
-        vector_31 = array([X1 - X3, Y1 - Y3, Z1 - Z3]).T
-        vector_34 = array([X4 - X3, Y4 - Y3, Z4 - Z3]).T
+        vector_32 = np.array([X2 - X3, Y2 - Y3, Z2 - Z3]).T
+        vector_31 = np.array([X1 - X3, Y1 - Y3, Z1 - Z3]).T
+        vector_34 = np.array([X4 - X3, Y4 - Y3, Z4 - Z3]).T
 
         # Define the plate's local x, y, and z axes
         x_axis = vector_34
-        z_axis = cross(x_axis, vector_32)
-        y_axis = cross(z_axis, x_axis)
+        z_axis = np.cross(x_axis, vector_32)
+        y_axis = np.cross(z_axis, x_axis)
 
         # Convert the x and y axes into unit vectors
         x_axis = x_axis/norm(x_axis)
         y_axis = y_axis/norm(y_axis)
 
         # Calculate the local (x, y) coordinates for each node
-        self.x1 = dot(vector_31, x_axis)
-        self.x2 = dot(vector_32, x_axis)
+        self.x1 = np.dot(vector_31, x_axis)
+        self.x2 = np.dot(vector_32, x_axis)
         self.x3 = 0
-        self.x4 = dot(vector_34, x_axis)
-        self.y1 = dot(vector_31, y_axis)
-        self.y2 = dot(vector_32, y_axis)
+        self.x4 = np.dot(vector_34, x_axis)
+        self.y1 = np.dot(vector_31, y_axis)
+        self.y2 = np.dot(vector_32, y_axis)
         self.y3 = 0
-        self.y4 = dot(vector_34, y_axis)
+        self.y4 = np.dot(vector_34, y_axis)
 
 #%%
     def J(self, r, s):
@@ -99,7 +99,7 @@ class Quad3D():
         x1, y1, x2, y2, x3, y3, x4, y4 = self.x1, self.y1, self.x2, self.y2, self.x3, self.y3, self.x4, self.y4
 
         # Return the Jacobian matrix
-        return 1/4*array([[x1*(s + 1) - x2*(s + 1) + x3*(s - 1) - x4*(s - 1), y1*(s + 1) - y2*(s + 1) + y3*(s - 1) - y4*(s - 1)],
+        return 1/4*np.array([[x1*(s + 1) - x2*(s + 1) + x3*(s - 1) - x4*(s - 1), y1*(s + 1) - y2*(s + 1) + y3*(s - 1) - y4*(s - 1)],
                           [x1*(r + 1) - x2*(r - 1) + x3*(r - 1) - x4*(r + 1), y1*(r + 1) - y2*(r - 1) + y3*(r - 1) - y4*(r + 1)]])
 
 #%%
@@ -110,20 +110,20 @@ class Quad3D():
         # Row 2 = interpolation functions differentiated with respect to y
         # Note that the inverse of the Jacobian converts from derivatives with
         # respect to r and s to derivatives with respect to x and y
-        dH = matmul(inv(self.J(r, s)), 1/4*array([[1 + s, -1 - s, -1 + s,  1 - s],                 
+        dH = np.matmul(inv(self.J(r, s)), 1/4*np.array([[1 + s, -1 - s, -1 + s,  1 - s],                 
                                                   [1 + r,  1 - r, -1 + r, -1 - r]]))
         
         # Row 1 = d(beta_x)/dx divided by the local displacement vector 'u'
         # Row 2 = d(beta_y)/dy divided by the local displacement vector 'u'
         # Row 3 = d(beta_x)/dy + d(beta_y)/dx divided by the local displacement vector 'u'
         # Note that beta_x is a function of -theta_y and beta_y is a function of +theta_x (Equations 5.99, p. 423)
-        B_kappa = array([[0,    0,     -dH[0, 0], 0,    0,     -dH[0, 1], 0,    0,     -dH[0, 2], 0,    0,     -dH[0, 3]],
+        B_kappa = np.array([[0,    0,     -dH[0, 0], 0,    0,     -dH[0, 1], 0,    0,     -dH[0, 2], 0,    0,     -dH[0, 3]],
                          [0, dH[1, 0],     0,     0, dH[1, 1],     0,     0, dH[1, 2],     0,     0, dH[1, 3],     0    ],
                          [0, dH[0, 0], -dH[1, 0], 0, dH[0, 1], -dH[1, 1], 0, dH[0, 2], -dH[1, 2], 0, dH[0, 3], -dH[1, 3]]])
         
         # Below is the matrix derived from the 1984 version of the MITC4 element. It appears to be
         # the same, but with a different sign convention for the section curvatures.
-        # B_kappa = array([[0,     0,     dH[0, 0],  0,     0,     dH[0, 1],  0,     0,     dH[0, 2],  0,     0,     dH[0, 3]],
+        # B_kappa = np.array([[0,     0,     dH[0, 0],  0,     0,     dH[0, 1],  0,     0,     dH[0, 2],  0,     0,     dH[0, 3]],
         #                  [0,  dH[1, 0],     0,     0,  dH[1, 1],     0,     0,  dH[1, 2],     0,     0,  dH[1, 3],     0   ],
         #                  [0, -dH[0, 0], dH[1, 0],  0, -dH[0, 1], dH[1, 1],  0, -dH[0, 2], dH[1, 2],  0, -dH[0, 3], dH[1, 3]]])
 
@@ -142,21 +142,21 @@ class Quad3D():
         plates.
         '''
 
-        H = 1/4*array([(1 + r)*(1 + s), (1 - r)*(1 + s), (1 - r)*(1 - s), (1 + r)*(1 - s)])
+        H = 1/4*np.array([(1 + r)*(1 + s), (1 - r)*(1 + s), (1 - r)*(1 - s), (1 + r)*(1 - s)])
 
         # Differentiate the interpolation functions
         # Row 1 = interpolation functions differentiated with respect to x
         # Row 2 = interpolation functions differentiated with respect to y
         # Note that the inverse of the Jacobian converts from derivatives with respect to r and s
         # to derivatives with respect to x and y
-        dH = matmul(inv(self.J(r, s)), 1/4*array([[1 + s, -1 - s, -1 + s,  1 - s],                 
+        dH = np.matmul(inv(self.J(r, s)), 1/4*np.array([[1 + s, -1 - s, -1 + s,  1 - s],                 
                                                   [1 + r,  1 - r, -1 + r, -1 - r]]))
 
         # Row 1 = d(beta_x)/dx divided by the local displacement vector 'u'
         # Row 2 = d(beta_y)/dy divided by the local displacement vector 'u'
         # Row 3 = d(beta_x)/dy + d(beta_y)/dx divided by the local displacement vector 'u'
         # Note that beta_x is a function of -theta_y and beta_y is a function of +theta_x (Equations 5.99, p. 423)
-        B_gamma = array([[dH[0, 0],   0,   H[0], dH[0, 1],   0,   H[1], dH[0, 2],   0,   H[2], dH[0, 3],   0,   H[3]],
+        B_gamma = np.array([[dH[0, 0],   0,   H[0], dH[0, 1],   0,   H[1], dH[0, 2],   0,   H[2], dH[0, 3],   0,   H[3]],
                          [dH[1, 0], -H[0],  0,   dH[1, 1], -H[1],  0,   dH[1, 2], -H[2],  0,   dH[1, 3], -H[3],  0  ]])
         
         return B_gamma
@@ -172,7 +172,7 @@ class Quad3D():
 
         # Get the local coordinates for the element
         x1, y1, x2, y2, x3, y3, x4, y4 = self.x1, self.y1, self.x2, self.y2, self.x3, self.y3, self.x4, self.y4
-        x_axis = array([1, 0, 0]).T
+        x_axis = np.array([1, 0, 0]).T
 
         # Reference 1, Equations 5.105
         Ax = x1 - x2 - x3 + x4
@@ -184,14 +184,14 @@ class Quad3D():
 
         # Find the angles between the axes of the natural coordinate system and
         # the local x-axis.
-        r_axis = array([(x1 + x4)/2 - (x2 + x3)/2, (y1 + y4)/2 - (y2 + y3)/2, 0]).T
-        s_axis = array([(x1 + x2)/2 - (x3 + x4)/2, (y1 + y2)/2 - (y3 + y4)/2, 0]).T
+        r_axis = np.array([(x1 + x4)/2 - (x2 + x3)/2, (y1 + y4)/2 - (y2 + y3)/2, 0]).T
+        s_axis = np.array([(x1 + x2)/2 - (x3 + x4)/2, (y1 + y2)/2 - (y3 + y4)/2, 0]).T
 
         r_axis = r_axis/norm(r_axis)
         s_axis = s_axis/norm(s_axis)
 
-        alpha = arccos(dot(r_axis, x_axis))
-        beta = arccos(dot(s_axis, x_axis))
+        alpha = np.arccos(np.dot(r_axis, x_axis))
+        beta = np.arccos(np.dot(s_axis, x_axis))
         # alpha = atan(Ay/Ax)
         # beta = pi/2 - atan(Cx/Cy)
         
@@ -202,11 +202,11 @@ class Quad3D():
         gs = ((Ax + s*Bx)**2 + (Ay + s*By)**2)**0.5/(8*det_J)
 
         # d      =           [    w1           theta_x1             theta_y1             w2            theta_x2              theta_y2            w3             theta_x3             theta_y3         w4             theta_x4             theta_y4      ]
-        gamma_rz = gr*array([[(1 + s)/2, -(y1 - y2)/4*(1 + s), (x1 - x2)/4*(1 + s), -(1 + s)/2,  -(y1 - y2)/4*(1 + s), (x1 - x2)/4*(1 + s), -(1 - s)/2, -(y4 - y3)/4*(1 - s), (x4 - x3)/4*(1 - s), (1 - s)/2,  -(y4 - y3)/4*(1 - s), (x4 - x3)/4*(1 - s)]])
-        gamma_sz = gs*array([[(1 + r)/2, -(y1 - y4)/4*(1 + r), (x1 - x4)/4*(1 + r),  (1 - r)/2,  -(y2 - y3)/4*(1 - r), (x2 - x3)/4*(1 - r), -(1 - r)/2, -(y2 - y3)/4*(1 - r), (x2 - x3)/4*(1 - r), -(1 + r)/2, -(y1 - y4)/4*(1 + r), (x1 - x4)/4*(1 + r)]])
+        gamma_rz = gr*np.array([[(1 + s)/2, -(y1 - y2)/4*(1 + s), (x1 - x2)/4*(1 + s), -(1 + s)/2,  -(y1 - y2)/4*(1 + s), (x1 - x2)/4*(1 + s), -(1 - s)/2, -(y4 - y3)/4*(1 - s), (x4 - x3)/4*(1 - s), (1 - s)/2,  -(y4 - y3)/4*(1 - s), (x4 - x3)/4*(1 - s)]])
+        gamma_sz = gs*np.array([[(1 + r)/2, -(y1 - y4)/4*(1 + r), (x1 - x4)/4*(1 + r),  (1 - r)/2,  -(y2 - y3)/4*(1 - r), (x2 - x3)/4*(1 - r), -(1 - r)/2, -(y2 - y3)/4*(1 - r), (x2 - x3)/4*(1 - r), -(1 + r)/2, -(y1 - y4)/4*(1 + r), (x1 - x4)/4*(1 + r)]])
         
         # Reference 1, Equations 5.102
-        B_gamma_MITC4 = zeros((2, 12))
+        B_gamma_MITC4 = np.zeros((2, 12))
         B_gamma_MITC4[0, :] = gamma_rz*sin(beta) - gamma_sz*sin(alpha)
         B_gamma_MITC4[1, :] = -gamma_rz*cos(beta) + gamma_sz*cos(alpha)
         
@@ -221,11 +221,11 @@ class Quad3D():
         # Row 2 = interpolation functions differentiated with respect to y
         # Note that the inverse of the Jacobian converts from derivatives with
         # respect to r and s to derivatives with respect to x and y
-        dH = matmul(inv(self.J(r, s)), 1/4*array([[s + 1, -s - 1, s - 1, -s + 1],                 
+        dH = np.matmul(inv(self.J(r, s)), 1/4*np.array([[s + 1, -s - 1, s - 1, -s + 1],                 
                                                   [r + 1, -r + 1, r - 1, -r - 1]]))
 
         # Reference 1, Example 5.5 (page 353)
-        B_m = array([[dH[0, 0],    0,     dH[0, 1],    0,     dH[0, 2],    0,     dH[0, 3],    0    ],
+        B_m = np.array([[dH[0, 0],    0,     dH[0, 1],    0,     dH[0, 2],    0,     dH[0, 3],    0    ],
                      [   0,     dH[1, 0],    0,     dH[1, 1],    0,     dH[1, 2],    0,     dH[1, 3]],
                      [dH[1, 0], dH[0, 0], dH[1, 1], dH[0, 1], dH[1, 2], dH[0, 2], dH[1, 3], dH[0, 3]]])
 
@@ -242,7 +242,7 @@ class Quad3D():
         E = self.E
         h = self.t
 
-        Cb = E*h**3/(12*(1 - nu**2))*array([[1,  nu,      0    ],
+        Cb = E*h**3/(12*(1 - nu**2))*np.array([[1,  nu,      0    ],
                                             [nu, 1,       0    ],
                                             [0,  0,  (1 - nu)/2]])
         
@@ -259,7 +259,7 @@ class Quad3D():
         h = self.t
         nu = self.nu
 
-        Cs = E*h*k/(2*(1 + nu))*array([[1, 0],
+        Cs = E*h*k/(2*(1 + nu))*np.array([[1, 0],
                                        [0, 1]])
 
         return Cs
@@ -284,7 +284,7 @@ class Quad3D():
         G = self.E/(2*(1 + self.nu))
 
         # Gallagher, Equation 9.3, page 251
-        Cm = 1/(1 - nu_xy*nu_yx)*array([[   Ex,    nu_yx*Ex,           0         ],
+        Cm = 1/(1 - nu_xy*nu_yx)*np.array([[   Ex,    nu_yx*Ex,           0         ],
                                         [nu_xy*Ey,    Ey,              0         ],
                                         [    0,        0,     (1 - nu_xy*nu_yx)*G]])
         
@@ -317,10 +317,10 @@ class Quad3D():
 
         # Create the stiffness matrix with bending stiffness terms
         # See Reference 1, Equation 5.94
-        k = (matmul(B1.T, matmul(Cb, B1))*J1 +
-             matmul(B2.T, matmul(Cb, B2))*J2 +
-             matmul(B3.T, matmul(Cb, B3))*J3 +
-             matmul(B4.T, matmul(Cb, B4))*J4)
+        k = (np.matmul(B1.T, np.matmul(Cb, B1))*J1 +
+             np.matmul(B2.T, np.matmul(Cb, B2))*J2 +
+             np.matmul(B3.T, np.matmul(Cb, B3))*J3 +
+             np.matmul(B4.T, np.matmul(Cb, B4))*J4)
 
         # Get the MITC4 shear B matrices for each gauss point
         B1 = self.B_gamma_MITC4(gp, gp)
@@ -336,10 +336,10 @@ class Quad3D():
         # B4 = self.B_gamma(gp, -gp)
 
         # Add shear stiffness terms to the stiffness matrix
-        k += (matmul(B1.T, matmul(Cs, B1))*J1 +
-              matmul(B2.T, matmul(Cs, B2))*J2 +
-              matmul(B3.T, matmul(Cs, B3))*J3 +
-              matmul(B4.T, matmul(Cs, B4))*J4)
+        k += (np.matmul(B1.T, np.matmul(Cs, B1))*J1 +
+              np.matmul(B2.T, np.matmul(Cs, B2))*J2 +
+              np.matmul(B3.T, np.matmul(Cs, B3))*J3 +
+              np.matmul(B4.T, np.matmul(Cs, B4))*J4)
         
         # Following Bathe's recommendation for the drilling degree of freedom
         # from Example 4.19 in "Finite Element Procedures, 2nd Ed.", calculate
@@ -358,7 +358,7 @@ class Quad3D():
                    )/1000
         
         # Initialize the expanded stiffness matrix to all zeros
-        k_exp = zeros((24, 24))
+        k_exp = np.zeros((24, 24))
 
         # Step through each term in the unexpanded stiffness matrix
         # i = Unexpanded matrix row
@@ -423,12 +423,12 @@ class Quad3D():
         B4 = self.B_m(gp, -gp)
 
         # See reference 1 at the bottom of page 353, and reference 2 page 466
-        k = t*(matmul(B1.T, matmul(Cm, B1))*det(self.J(gp, gp)) +
-               matmul(B2.T, matmul(Cm, B2))*det(self.J(-gp, gp)) +
-               matmul(B3.T, matmul(Cm, B3))*det(self.J(-gp, -gp)) +
-               matmul(B4.T, matmul(Cm, B4))*det(self.J(gp, -gp)))
+        k = t*(np.matmul(B1.T, np.matmul(Cm, B1))*det(self.J(gp, gp)) +
+               np.matmul(B2.T, np.matmul(Cm, B2))*det(self.J(-gp, gp)) +
+               np.matmul(B3.T, np.matmul(Cm, B3))*det(self.J(-gp, -gp)) +
+               np.matmul(B4.T, np.matmul(Cm, B4))*det(self.J(gp, -gp)))
         
-        k_exp = zeros((24, 24))
+        k_exp = np.zeros((24, 24))
 
         # Step through each term in the unexpanded stiffness matrix
         # i = Unexpanded matrix row
@@ -470,7 +470,7 @@ class Quad3D():
         self._local_coords()
 
         # Sum the bending and membrane stiffness matrices
-        return add(self.k_b(), self.k_m())
+        return np.add(self.k_b(), self.k_m())
 
 #%%   
     def f(self, combo_name='Combo 1'):
@@ -479,7 +479,7 @@ class Quad3D():
         """
         
         # Calculate and return the plate's local end force vector
-        return add(matmul(self.k(), self.d(combo_name)), self.fer(combo_name))
+        return np.add(np.matmul(self.k(), self.d(combo_name)), self.fer(combo_name))
 
 #%%
     def fer(self, combo_name='Combo 1'):
@@ -492,10 +492,10 @@ class Quad3D():
             The name of the load combination to get the consistent load vector for.
         '''
         
-        Hw = lambda r, s : 1/4*array([[(1 + r)*(1 + s), 0, 0, (1 - r)*(1 + s), 0, 0, (1 - r)*(1 - s), 0, 0, (1 + r)*(1 - s), 0, 0]])
+        Hw = lambda r, s : 1/4*np.array([[(1 + r)*(1 + s), 0, 0, (1 - r)*(1 + s), 0, 0, (1 - r)*(1 - s), 0, 0, (1 + r)*(1 - s), 0, 0]])
 
         # Initialize the fixed end reaction vector
-        fer = zeros((12,1))
+        fer = np.zeros((12,1))
 
         # Get the requested load combination
         combo = self.model.LoadCombos[combo_name]
@@ -524,7 +524,7 @@ class Quad3D():
              + Hw(gp, -gp).T*p*det(self.J(gp, -gp)))
 
         # Initialize the expanded vector to all zeros
-        fer_exp = zeros((24, 1))
+        fer_exp = np.zeros((24, 1))
 
         # Step through each term in the unexpanded vector
         # i = Unexpanded vector row
@@ -555,7 +555,7 @@ class Quad3D():
        """
 
        # Calculate and return the local displacement vector
-       return matmul(self.T(), self.D(combo_name))
+       return np.matmul(self.T(), self.D(combo_name))
 
 #%%
     def F(self, combo_name='Combo 1'):
@@ -569,7 +569,7 @@ class Quad3D():
         """
         
         # Calculate and return the global force vector
-        return matmul(inv(self.T()), self.f(combo_name))
+        return np.matmul(inv(self.T()), self.f(combo_name))
 
 #%%
     def D(self, combo_name='Combo 1'):
@@ -585,7 +585,7 @@ class Quad3D():
         '''
         
         # Initialize the displacement vector
-        D = zeros((24, 1))
+        D = np.zeros((24, 1))
         
         # Read in the global displacements from the nodes
         D[0, 0] = self.m_node.DX[combo_name]
@@ -629,7 +629,7 @@ class Quad3D():
         T = self.T()
 
         # Calculate and return the stiffness matrix in global coordinates
-        return matmul(matmul(inv(T), self.k()), T)
+        return np.matmul(np.matmul(inv(T), self.k()), T)
 
 #%% 
     # Global fixed end reaction vector
@@ -645,7 +645,7 @@ class Quad3D():
         '''
         
         # Calculate and return the fixed end reaction vector
-        return matmul(inv(self.T()), self.fer(combo_name))
+        return np.matmul(inv(self.T()), self.fer(combo_name))
 
 #%%  
     def T(self):
@@ -678,7 +678,7 @@ class Quad3D():
 
         # Find a vector perpendicular to the plate surface to get the
         # orientation of the local z-axis.
-        z = cross(x, xy)
+        z = np.cross(x, xy)
         
         # Divide the z-vector by its magnitude to produce a unit z-vector of
         # direction cosines.
@@ -687,7 +687,7 @@ class Quad3D():
 
         # Calculate the local y-axis as a vector perpendicular to the local z
         # and x-axes.
-        y = cross(z, x)
+        y = np.cross(z, x)
         
         # Divide the y-vector by its magnitude to produce a unit vector of
         # direction cosines.
@@ -695,12 +695,12 @@ class Quad3D():
         y = [y[0]/mag, y[1]/mag, y[2]/mag]
 
         # Create the direction cosines matrix.
-        dirCos = array([x,
+        dirCos = np.array([x,
                         y,
                         z])
         
         # Build the transformation matrix.
-        T = zeros((24, 24))
+        T = np.zeros((24, 24))
         T[0:3, 0:3] = dirCos
         T[3:6, 3:6] = dirCos
         T[6:9, 6:9] = dirCos
@@ -714,7 +714,7 @@ class Quad3D():
         return T
 
 #%%
-    def shear(self, r=0, s=0, combo_name='Combo 1'):
+    def shear(self, r=0, s=0, local=True, combo_name='Combo 1'):
         '''
         Returns the interal shears at any point in the quad element.
 
@@ -745,26 +745,37 @@ class Quad3D():
         s_ex = s/gp
 
         # Define the interpolation functions
-        H = 1/4*array([(1 + r_ex)*(1 + s_ex), (1 - r_ex)*(1 + s_ex), (1 - r_ex)*(1 - s_ex), (1 + r_ex)*(1 - s_ex)])
+        H = 1/4*np.array([(1 + r_ex)*(1 + s_ex), (1 - r_ex)*(1 + s_ex), (1 - r_ex)*(1 - s_ex), (1 + r_ex)*(1 - s_ex)])
 
         # Get the stress-strain matrix
         Cs = self.Cs()
 
         # Calculate the internal shears [Qx, Qy] at each gauss point
-        q1 = matmul(Cs, matmul(self.B_gamma_MITC4(gp, gp), d))
-        q2 = matmul(Cs, matmul(self.B_gamma_MITC4(-gp, gp), d))
-        q3 = matmul(Cs, matmul(self.B_gamma_MITC4(-gp, -gp), d))
-        q4 = matmul(Cs, matmul(self.B_gamma_MITC4(gp, -gp), d))
+        q1 = np.matmul(Cs, np.matmul(self.B_gamma_MITC4(gp, gp), d))
+        q2 = np.matmul(Cs, np.matmul(self.B_gamma_MITC4(-gp, gp), d))
+        q3 = np.matmul(Cs, np.matmul(self.B_gamma_MITC4(-gp, -gp), d))
+        q4 = np.matmul(Cs, np.matmul(self.B_gamma_MITC4(gp, -gp), d))
 
         # Extrapolate to get the value at the requested location
         Qx = H[0]*q1[0] + H[1]*q2[0] + H[2]*q3[0] + H[3]*q4[0]
         Qy = H[0]*q1[1] + H[1]*q2[1] + H[2]*q3[1] + H[3]*q4[1]
 
-        return array([Qx,
-                      Qy])
+        if local:
+            
+            return np.array([Qx,
+                             Qy])
+        
+        else:
+            
+            # Get the direction cosines for the plate's local coordinate system
+            dir_cos = self.T()[:3, :3]
+
+            return np.matmul(np.linalg.inv(dir_cos), np.array([Qx,
+                                                               Qy,
+                                                               [0]]))
 
 #%%   
-    def moment(self, r=0, s=0, combo_name='Combo 1'):
+    def moment(self, r=0, s=0, local=True, combo_name='Combo 1'):
         '''
         Returns the interal moments at any point in the quad element.
 
@@ -795,28 +806,40 @@ class Quad3D():
         s_ex = s/gp
 
         # Define the interpolation functions
-        H = 1/4*array([(1 + r_ex)*(1 + s_ex), (1 - r_ex)*(1 + s_ex), (1 - r_ex)*(1 - s_ex), (1 + r_ex)*(1 - s_ex)])
+        H = 1/4*np.array([(1 + r_ex)*(1 + s_ex), (1 - r_ex)*(1 + s_ex), (1 - r_ex)*(1 - s_ex), (1 + r_ex)*(1 - s_ex)])
 
         # Get the stress-strain matrix
         Cb = self.Cb()
 
         # Calculate the internal moments [Mx, My, Mxy] at each gauss point
-        m1 = matmul(Cb, matmul(self.B_kappa(gp, gp), d))
-        m2 = matmul(Cb, matmul(self.B_kappa(-gp, gp), d))
-        m3 = matmul(Cb, matmul(self.B_kappa(-gp, -gp), d))
-        m4 = matmul(Cb, matmul(self.B_kappa(gp, -gp), d))
+        m1 = np.matmul(Cb, np.matmul(self.B_kappa(gp, gp), d))
+        m2 = np.matmul(Cb, np.matmul(self.B_kappa(-gp, gp), d))
+        m3 = np.matmul(Cb, np.matmul(self.B_kappa(-gp, -gp), d))
+        m4 = np.matmul(Cb, np.matmul(self.B_kappa(gp, -gp), d))
 
         # Extrapolate to get the value at the requested location
         Mx = H[0]*m1[0] + H[1]*m2[0] + H[2]*m3[0] + H[3]*m4[0]
         My = H[0]*m1[1] + H[1]*m2[1] + H[2]*m3[1] + H[3]*m4[1]
         Mxy = H[0]*m1[2] + H[1]*m2[2] + H[2]*m3[2] + H[3]*m4[2]
         
-        return array([Mx,
-                      My,
-                      Mxy])
+        if local:
+
+            return np.array([Mx,
+                             My,
+                             Mxy])
+        
+        else:
+            
+            # Get the direction cosines for the plate's local coordinate system
+            dir_cos = self.T()[:3, :3]
+
+            # Convert the plate flexural stresses to global coordinates
+            return np.matmul(np.linalg.inv(dir_cos), np.array([Mx,
+                                                               My,
+                                                               [0]]))
 
 #%%
-    def membrane(self, r=0, s=0, combo_name='Combo 1'):
+    def membrane(self, r=0, s=0, local=True, combo_name='Combo 1'):
         
         # Get the plate's local displacement vector
         # Slice out terms not related to membrane forces
@@ -830,22 +853,35 @@ class Quad3D():
         s_ex = s/gp
 
         # Define the interpolation functions
-        H = 1/4*array([(1 + r_ex)*(1 + s_ex), (1 - r_ex)*(1 + s_ex), (1 - r_ex)*(1 - s_ex), (1 + r_ex)*(1 - s_ex)])
+        H = 1/4*np.array([(1 + r_ex)*(1 + s_ex), (1 - r_ex)*(1 + s_ex), (1 - r_ex)*(1 - s_ex), (1 + r_ex)*(1 - s_ex)])
 
         # Get the stress-strain matrix
         Cm = self.Cm()
         
         # Calculate the internal stresses [Sx, Sy, Txy] at each gauss point
-        s1 = matmul(Cm, matmul(self.B_m(gp, gp), d))
-        s2 = matmul(Cm, matmul(self.B_m(-gp, gp), d))
-        s3 = matmul(Cm, matmul(self.B_m(-gp, -gp), d))
-        s4 = matmul(Cm, matmul(self.B_m(gp, -gp), d))
+        s1 = np.matmul(Cm, np.matmul(self.B_m(gp, gp), d))
+        s2 = np.matmul(Cm, np.matmul(self.B_m(-gp, gp), d))
+        s3 = np.matmul(Cm, np.matmul(self.B_m(-gp, -gp), d))
+        s4 = np.matmul(Cm, np.matmul(self.B_m(gp, -gp), d))
 
         # Extrapolate to get the value at the requested location
         Sx = H[0]*s1[0] + H[1]*s2[0] + H[2]*s3[0] + H[3]*s4[0]
         Sy = H[0]*s1[1] + H[1]*s2[1] + H[2]*s3[1] + H[3]*s4[1]
         Txy = H[0]*s1[2] + H[1]*s2[2] + H[2]*s3[2] + H[3]*s4[2]
 
-        return array([Sx,
-                      Sy,
-                      Txy])
+        if local:
+
+            return np.array([Sx,
+                             Sy,
+                             Txy])
+        
+        else:
+
+            # Get the direction cosines for the plate's local coordinate system
+            dir_cos = self.T()[:3, :3]
+
+            # Convert the plate membrane stresses to global coordinates
+            return np.matmul(np.linalg.inv(dir_cos), np.array([Sx,
+                                                               Sy,
+                                                               [0]]))
+

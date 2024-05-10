@@ -66,8 +66,14 @@ model.add_load_combo('1.4F', {'Hydrostatic': 1.4})
 # Analyze the model
 # import cProfile
 # cProfile.run('model.analyze()', sort='cumtime')
-model.analyze()
+model.analyze(log=True)
 
-# Render the model. Labels and loads will be turned off to speed up interaction.
-from PyNite.Visualization import Renderer, render_model
-render_model(model, 0.1, render_loads=True, color_map='dz', combo_name='1.4F', labels=False)
+# Render the model
+from PyNite.Rendering import Renderer
+rndr = Renderer(model)
+rndr.annotation_size = 0.1
+rndr.render_loads = False
+rndr.color_map = 'SX'
+rndr.combo_name = '1.4F'
+rndr.show_labels = False
+rndr.render_model()

@@ -1,3 +1,4 @@
+import numpy as np
 from numpy import zeros, array, matmul, cross, add
 from numpy.linalg import inv, norm, det
 
@@ -574,7 +575,7 @@ class Plate3D():
         # Return the plate bending constants
         return inv(self._C()) @ d
 
-    def moment(self, x, y, combo_name='Combo 1'):
+    def moment(self, x, y, local=True, combo_name='Combo 1'):
         """
         Returns the internal moments (Mx, My, and Mxy) at any point (x, y) in the plate's local
         coordinate system
@@ -592,10 +593,26 @@ class Plate3D():
         
         # Calculate and return internal moments
         # A negative sign will be applied to change the sign convention to match that of
-        # PyNite's quadrilateral elements.
-        return -self.Db() @ self._Q(x, y) @ self._a(combo_name)
+        # Pynite's quadrilateral elements.
+        Mx, My, Mxy = -self.Db() @ self._Q(x, y) @ self._a(combo_name)
+
+        if local:
+
+            return np.array([Mx,
+                             My,
+                             Mxy])
+        
+        else:
+
+            # Get the direction cosines for the plate's local coordinate system
+            dir_cos = self.T()[:3, :3]
+
+            # Convert the plate flexural stresses to global coordinates
+            return np.matmul(np.linalg.inv(dir_cos), np.array([Mx,
+                                                               My,
+                                                               [0]]))
  
-    def shear(self, x, y, combo_name='Combo 1'):
+    def shear(self, x, y, local=True, combo_name='Combo 1'):
         """
         Returns the internal shears (Qx and Qy) at any point (x, y) in the plate's local
         coordinate system
@@ -637,10 +654,22 @@ class Plate3D():
         Qy = (dMy_dy + dMxy_dx)[0]
 
         # Return internal shears
-        return array([[Qx], 
-                       [Qy]])
+        if local:
 
-    def membrane(self, x, y, combo_name='Combo 1'):
+            return array([[Qx], 
+                          [Qy],])
+        
+        else:
+
+            # Get the direction cosines for the plate's local coordinate system
+            dir_cos = self.T()[:3, :3]
+
+            # Convert the plate shear stresses to global coordinates
+            return np.matmul(np.linalg.inv(dir_cos), np.array([[Qx],
+                                                               [Qy],
+                                                               [0]]))
+
+    def membrane(self, x, y, local=True, combo_name='Combo 1'):
         
         # Convert the (x, y) coordinates to (r, x) coordinates
         r = -1 + 2*x/self.width()
@@ -674,6 +703,18 @@ class Plate3D():
         Sy = H[0]*s1[1] + H[1]*s2[1] + H[2]*s3[1] + H[3]*s4[1]
         Txy = H[0]*s1[2] + H[1]*s2[2] + H[2]*s3[2] + H[3]*s4[2]
 
-        return array([Sx,
-                      Sy,
-                      Txy])
+        if local:
+
+            return array([Sx,
+                          Sy,
+                          Txy])
+
+        else:
+
+            # Get the direction cosines for the plate's local coordinate system
+            dir_cos = self.T()[:3, :3]
+
+            # Convert the plate membrane stresses to global coordinates
+            return np.matmul(np.linalg.inv(dir_cos), np.array([Sx,
+                                                               Sy,
+                                                               [0]]))
