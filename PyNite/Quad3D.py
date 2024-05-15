@@ -770,9 +770,9 @@ class Quad3D():
             # Get the direction cosines for the plate's local coordinate system
             dir_cos = self.T()[:3, :3]
 
-            return np.matmul(np.linalg.inv(dir_cos), np.array([Qx,
-                                                               Qy,
-                                                               [0]]))
+            return np.matmul(dir_cos.T, np.array([Qx,
+                                                  Qy,
+                                                  [0]]))
 
 #%%   
     def moment(self, r=0, s=0, local=True, combo_name='Combo 1'):
@@ -834,9 +834,9 @@ class Quad3D():
             dir_cos = self.T()[:3, :3]
 
             # Convert the plate flexural stresses to global coordinates
-            return np.matmul(np.linalg.inv(dir_cos), np.array([Mx,
-                                                               My,
-                                                               [0]]))
+            return np.matmul(dir_cos.T, np.array([Mx,
+                                                  My,
+                                                  [0]]))
 
 #%%
     def membrane(self, r=0, s=0, local=True, combo_name='Combo 1'):
@@ -881,7 +881,7 @@ class Quad3D():
             dir_cos = self.T()[:3, :3]
 
             # Convert the plate membrane stresses to global coordinates
-            return np.matmul(np.linalg.inv(dir_cos), np.array([Sx,
-                                                               Sy,
-                                                               [0]]))
+            return np.matmul(dir_cos.T, np.array([Sx,
+                                                  Sy,
+                                                  [0]]))
 

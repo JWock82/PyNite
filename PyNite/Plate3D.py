@@ -608,9 +608,9 @@ class Plate3D():
             dir_cos = self.T()[:3, :3]
 
             # Convert the plate flexural stresses to global coordinates
-            return np.matmul(np.linalg.inv(dir_cos), np.array([Mx,
-                                                               My,
-                                                               [0]]))
+            return np.matmul(dir_cos.T, np.array([Mx,
+                                                  My,
+                                                  [0]]))
  
     def shear(self, x, y, local=True, combo_name='Combo 1'):
         """
@@ -665,9 +665,9 @@ class Plate3D():
             dir_cos = self.T()[:3, :3]
 
             # Convert the plate shear stresses to global coordinates
-            return np.matmul(np.linalg.inv(dir_cos), np.array([[Qx],
-                                                               [Qy],
-                                                               [0]]))
+            return np.matmul(dir_cos.T, np.array([[Qx],
+                                                  [Qy],
+                                                  [0]]))
 
     def membrane(self, x, y, local=True, combo_name='Combo 1'):
         
@@ -715,6 +715,6 @@ class Plate3D():
             dir_cos = self.T()[:3, :3]
 
             # Convert the plate membrane stresses to global coordinates
-            return np.matmul(np.linalg.inv(dir_cos), np.array([Sx,
-                                                               Sy,
-                                                               [0]]))
+            return np.matmul(dir_cos.T, np.array([Sx,
+                                                  Sy,
+                                                  [0]]))
