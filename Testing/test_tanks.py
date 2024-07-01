@@ -59,7 +59,9 @@ class Test_Tanks(unittest.TestCase):
             p = (H - avg_Y)*w
 
             tank_model.add_quad_surface_pressure(element.name, p)
-        
+
+            #Use default local axes
+            element.local_x_axis = None
 
         # Add fixed supports to the base
         for node in tank_model.Nodes.values():

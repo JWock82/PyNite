@@ -4,7 +4,9 @@ from numpy import array, atleast_2d, zeros, subtract, matmul, divide, seterr, na
 from numpy.linalg import solve
 
 def _prepare_model(model):
-    """Prepares a model for analysis by ensuring at least one load combination is defined, generating all meshes that have not already been generated, activating all non-linear members, and internally numbering all nodes and elements.
+    """Prepares a model for analysis by ensuring at least one load combination is defined,
+    generating all meshes that have not already been generated, activating all non-linear members,
+    and internally numbering all nodes and elements.
 
     :param model: The model being prepared for analysis.
     :type model: FEModel3D
@@ -39,7 +41,11 @@ def _prepare_model(model):
     for phys_member in model.Members.values():
         for combo_name in model.LoadCombos.keys():
             phys_member.active[combo_name] = True
-    
+            
+    #Precalculate local axes and node coordinates for Quad elements
+    for quad in model.Quads.values():
+        quad._local_coords()
+        
     # Assign an internal ID to all nodes and elements in the model. This number is different from the name used by the user to identify nodes and elements.
     _renumber(model)
 

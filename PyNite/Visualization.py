@@ -23,7 +23,10 @@ class Renderer():
         self.deformed_scale = 30
         self.render_nodes = True
         self.render_loads = True
+        self.show_plate_edges = True
         self.color_map = None
+        self.num_contours = -1 #-1 will provide smooth contours, values greater than 0 will create banded contours
+        self.contour_range = (None, None) #(minval, maxval)
         self.combo_name = 'Combo 1'
         self.case = None
         self.labels = True
@@ -77,6 +80,12 @@ class Renderer():
         :type color_map: str, optional
         """
         self.color_map = color_map
+        
+    def set_contour_range(self, minval=None, maxval=None):
+        self.contour_range = (minval, maxval)
+        
+    def set_number_of_contours(self, num_contours = -1):
+        self.num_contours = num_contours
     
     def set_combo_name(self, combo_name='Combo 1'):
         self.combo_name = combo_name
@@ -348,7 +357,8 @@ class Renderer():
         if self.model.Quads or self.model.Plates:
             _RenderContours(self.model, renderer, self.deformed_shape, self.deformed_scale,
                             self.color_map, self.scalar_bar, self.scalar_bar_text_size,
-                            self.combo_name, self.theme)
+                            self.combo_name, self.show_plate_edges, self.num_contours, self.contour_range,
+                            self.theme)
 
         # Set the window's background color
         if self.theme == 'default':
@@ -1607,10 +1617,10 @@ def _RenderLoads(model, renderer, annotation_size, combo_name, case, theme='defa
     
     # Step through each node
     for node in model.Nodes.values():
-    
+        
         # Step through and display each nodal load
         for load in node.NodeLoads:
-          
+            
             # Determine if this load is part of the requested LoadCombo or case
             if load[2] in load_factors:
               
@@ -1638,7 +1648,7 @@ def _RenderLoads(model, renderer, annotation_size, combo_name, case, theme='defa
                 polydata.AddInputData(ptLoad.polydata.GetOutput())
                 renderer.AddActor(ptLoad.lblActor)
                 ptLoad.lblActor.SetCamera(renderer.GetActiveCamera())
-    
+                
     # Step through each member
     for member in model.Members.values():
     
@@ -1826,7 +1836,10 @@ def _RenderLoads(model, renderer, annotation_size, combo_name, case, theme='defa
     elif theme == 'print':
         polygon_actor.GetProperty().SetColor(255/255, 0/255, 0/255)  # Red
 
-def _RenderContours(model, renderer, deformed_shape, deformed_scale, color_map, scalar_bar, scalar_bar_text_size, combo_name, theme='default'):
+def _RenderContours(model, renderer, deformed_shape, deformed_scale, color_map,
+                    scalar_bar, scalar_bar_text_size, combo_name, show_plate_edges = True,
+                    num_contours = -1, contour_range=(None,None),
+                    theme='default'):
   
     # Create a new `vtkCellArray` object to store the elements
     plates = vtk.vtkCellArray()
@@ -1917,35 +1930,104 @@ def _RenderContours(model, renderer, deformed_shape, deformed_scale, color_map, 
     # Add the points and plates to the dataset
     plate_polydata.SetPoints(plate_points)
     plate_polydata.SetPolys(plates)
-      
-    # Setup actor and mapper for the plates
-    plate_mapper = vtk.vtkPolyDataMapper()
-    plate_mapper.SetInputData(plate_polydata)
-    plate_actor = vtk.vtkActor()
-    plate_actor.SetMapper(plate_mapper)
+
+    #Extract plate edges
+    if show_plate_edges:
+        polyedges = vtk.vtkExtractEdges()
+        polyedges.SetInputData(plate_polydata)
+        polyedges.Update()
+        
+        polyedgeMapper = vtk.vtkPolyDataMapper()
+        polyedgeMapper.SetInputData(polyedges.GetOutput())
+        
+        polyedgeActor = vtk.vtkActor()
+        polyedgeActor.SetMapper(polyedgeMapper)
+        polyedgeActor.GetProperty().SetColor(0, 0, 0)
+                
+    #Add scalar data
+    if color_map: plate_polydata.GetPointData().SetScalars(plate_results)
     
     # Map the results to the plates
-    if color_map != None:
-          
-        plate_polydata.GetPointData().SetScalars(plate_results)
+    if color_map is None:
+        # Setup actor and mapper for the plates
+        plate_mapper = vtk.vtkPolyDataMapper()
+        plate_mapper.SetInputData(plate_polydata)
+                    
+    else:
+        #Convert mesh to triangles and subdivide for smoother results
+        tri_converter = vtk.vtkTriangleFilter()
+        tri_converter.SetInputDataObject(plate_polydata)
+        tri_converter.Update()
+        
+        subdivisionFilter = vtk.vtkLinearSubdivisionFilter()
+        subdivisionFilter.SetNumberOfSubdivisions(3)
+        subdivisionFilter.SetInputData(tri_converter.GetOutput())
+        subdivisionFilter.Update()
+    
+        min_contour = contour_range[0] if contour_range[0] is not None else min(results)
+        max_contour = contour_range[1] if contour_range[1] is not None else max(results)
             
-        # Create a `vtkLookupTable` for the colors used to map results
-        lut = vtk.vtkLookupTable()
-        lut.SetTableRange(min(results), max(results))
-        lut.SetNumberOfColors(256) 
-        # The commented code below can be uncommented and modified to change the color scheme
-        # ctf = vtk.vtkColorTransferFunction()
-        # ctf.SetColorSpaceToDiverging()
-        # ctf.AddRGBPoint(min(results), 255, 0, 255)  # Purple
-        # ctf.AddRGBPoint(max(results), 255, 0, 0)    # Red
-        # for i in range(256):
-        #   rgb = list(ctf.GetColor(float(i)/256))
-        #   rgb.append(1.0)
-        #   lut.SetTableValue(i, *rgb)
-        plate_mapper.SetLookupTable(lut)
-        plate_mapper.SetUseLookupTableScalarRange(True)
-        plate_mapper.SetScalarModeToUsePointData()
-        lut.Build()
+        if num_contours<0: 
+            #Create smooth contours (256 values)
+            
+            # Create a `vtkLookupTable` for the colors used to map results
+            lut = vtk.vtkLookupTable()
+            lut.SetTableRange(min_contour, max_contour)
+            lut.SetNumberOfColors(256) 
+            # The commented code below can be uncommented and modified to change the color scheme
+            # ctf = vtk.vtkColorTransferFunction()
+            # ctf.SetColorSpaceToDiverging()
+            # ctf.AddRGBPoint(min_contour, 255, 0, 255)  # Purple
+            # ctf.AddRGBPoint(max_contour, 255, 0, 0)    # Red
+            # for i in range(256):
+            #   rgb = list(ctf.GetColor(float(i)/256))
+            #   rgb.append(1.0)
+            #   lut.SetTableValue(i, *rgb)
+            lut.Build()
+            
+            # Setup actor and mapper for the plates
+            plate_mapper = vtk.vtkPolyDataMapper()
+            plate_mapper.SetInputData(subdivisionFilter.GetOutput())
+            plate_mapper.SetLookupTable(lut)
+            plate_mapper.SetUseLookupTableScalarRange(True)
+            plate_mapper.SetScalarModeToUsePointData()
+            
+        else:
+            #Create banded contours
+            if num_contours < 2:
+                raise ValueError("At least two contours are required to generate banded contours.")
+            
+            bf = vtk.vtkBandedPolyDataContourFilter()
+            bf.SetInputData(subdivisionFilter.GetOutput())
+            bf.SetGenerateContourEdges(True)
+            bf.SetScalarModeToValue()
+            bf.GenerateValues(num_contours, (min_contour, max_contour))
+            bf.Update()
+            
+            lut = vtk.vtkLookupTable()
+            lut.SetNumberOfTableValues(num_contours)
+            lut.SetTableRange((min_contour,max_contour))
+            lut.SetHueRange(.667, 0.0)
+            lut.SetAlphaRange(1., 1.)
+            lut.IndexedLookupOff()
+            lut.Build()
+            
+            edgeMapper = vtk.vtkPolyDataMapper()
+            edgeMapper.SetInputData(bf.GetContourEdgesOutput())
+            edgeMapper.SetResolveCoincidentTopologyToPolygonOffset()
+            
+            edgeActor = vtk.vtkActor()
+            edgeActor.SetMapper(edgeMapper)
+            edgeActor.GetProperty().SetColor(0, 0, 0)
+            renderer.AddActor(edgeActor)
+            
+            plate_mapper = vtk.vtkPolyDataMapper()
+            plate_mapper.SetInputConnection(bf.GetOutputPort())
+            plate_mapper.SetLookupTable(lut)
+            plate_mapper.SetScalarRange((min_contour,max_contour))
+            plate_mapper.SetScalarModeToUseCellData()
+            
+            plate_mapper.Update() 
       
         # Add the scalar bar for the contours.
         if scalar_bar:
@@ -1974,9 +2056,15 @@ def _RenderContours(model, renderer, deformed_shape, deformed_scale, color_map, 
             scalar.SetLookupTable(lut)
 
             renderer.AddActor(scalar)
-      
-    # Add the actor for the plates
-    renderer.AddActor(plate_actor)
+
+    # Add the actor for the plates to the renderer    
+    plate_actor = vtk.vtkActor()
+    plate_actor.SetMapper(plate_mapper)
+    renderer.AddActor(plate_actor) 
+        
+    if show_plate_edges: 
+        #Add edges last so that they're not obscured by the plate actor
+        renderer.AddActor(polyedgeActor)      
 
 def _MaxLoads(model, combo_name=None, case=None):
 
