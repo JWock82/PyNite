@@ -5,6 +5,7 @@ from math import isclose
 
 from numpy import array, zeros, matmul, divide, subtract, atleast_2d, all
 from numpy.linalg import solve
+from scipy.spatial import KDTree
 
 from PyNite.Node3D import Node3D
 from PyNite.Material import Material
@@ -96,8 +97,7 @@ class FEModel3D():
     def add_node(self, name, X, Y, Z):
         """Adds a new node to the model.
 
-        :param name: A unique user-defined name for the node. If set to None or "" a name will be
-                     automatically assigned.
+        :param name: A unique user-defined name for the node. If set to None or "" a name will be automatically assigned.
         :type name: str
         :param X: The node's global X-coordinate.
         :type X: number
@@ -724,6 +724,25 @@ class FEModel3D():
         #Return the mesh's name
         return name
 
+    def determine_proximal_nodes(self, tolerance=0.001):
+        """A method using a KD-Tree to efficiently determine nodes which are within a certain distance of each other"""
+
+        #TODO: add nodes that are not in the FEA structure
+        #TODO: add nodes that are in another structure + origin offset (for merging frames)
+        nodes = list(self.Nodes.keys())
+        data = list([(v.X,v.Y,v.Z) for v in self.Nodes.values()])
+
+        #make the tree
+        tree = KDTree(data)
+        #find pairs within distance (exact)
+        indexes = tree.query_pairs(r=tolerance)
+        out = []
+        #get the mode names
+        for i, j in indexes:
+            out.append((nodes[i], nodes[j]))
+        return out
+
+
     def merge_duplicate_nodes(self, tolerance=0.001):
         """Removes duplicate nodes from the model and returns a list of the removed node names.
 
@@ -768,7 +787,7 @@ class FEModel3D():
             if node_lookup[node_1_name] is None:
                 continue
 
-            # There is no need to check `node_1` against itself
+            #Check combinations. There is no need to check `node_1` against itself
             for node_2_name in node_names[i + 1:]:
 
                 # Skip iteration if node_2 has already been removed
@@ -776,12 +795,14 @@ class FEModel3D():
                     continue
 
                 # Calculate the distance between nodes
-                if self.Nodes[node_1_name].distance(self.Nodes[node_2_name]) > tolerance:
+                n2 = self.Nodes[node_2_name]
+                n1 = self.Nodes[node_1_name]
+                if n1.distance(n2) > tolerance:
                     continue
 
                 # Replace references to `node_2` in each element with references to `node_1`
                 for element, node_type in node_lookup[node_2_name]:
-                    setattr(element, node_type, self.Nodes[node_1_name])
+                    setattr(element, node_type, n1)
 
                 # Flag `node_2` as no longer used
                 node_lookup[node_2_name] = None
@@ -789,15 +810,15 @@ class FEModel3D():
                 # Merge any boundary conditions
                 support_cond = ('support_DX', 'support_DY', 'support_DZ', 'support_RX', 'support_RY', 'support_RZ')
                 for dof in support_cond:
-                    if getattr(self.Nodes[node_2_name], dof) == True:
-                        setattr(self.Nodes[node_1_name], dof, True)
+                    if getattr(n2, dof) == True:
+                        setattr(n1, dof, True)
                 
                 # Merge any spring supports
                 spring_cond = ('spring_DX', 'spring_DY', 'spring_DZ', 'spring_RX', 'spring_RY', 'spring_RZ')
                 for dof in spring_cond:
-                    value = getattr(self.Nodes[node_2_name], dof)
+                    value = getattr(n2, dof)
                     if value != [None, None, None]:
-                        setattr(self.Nodes[node_1_name], dof, value)
+                        setattr(n1, dof, value)
                 
                 # Fix the mesh labels
                 for mesh in self.Meshes.values():
@@ -806,17 +827,22 @@ class FEModel3D():
                     if node_2_name in mesh.nodes.keys():
 
                         # Attach the correct node to the mesh
-                        mesh.nodes[node_2_name] = self.Nodes[node_1_name]
+                        mesh.nodes[node_2_name] = n1
 
                         # Fix the dictionary key
+                        #print(f'{mesh} rmv {node_2_name} -> {node_1_name}')
                         mesh.nodes[node_1_name] = mesh.nodes.pop(node_2_name)
 
                     # Fix the elements in the mesh
                     for element in mesh.elements.values():
-                        if node_2_name == element.i_node.name: element.i_node = self.Nodes[node_1_name]
-                        if node_2_name == element.j_node.name: element.j_node = self.Nodes[node_1_name]
-                        if node_2_name == element.m_node.name: element.m_node = self.Nodes[node_1_name]
-                        if node_2_name == element.n_node.name: element.n_node = self.Nodes[node_1_name]
+                        if node_2_name == element.i_node.name: 
+                            element.i_node = n1
+                        if node_2_name == element.j_node.name: 
+                            element.j_node = n1
+                        if node_2_name == element.m_node.name: 
+                            element.m_node = n1
+                        if node_2_name == element.n_node.name: 
+                            element.n_node = n1
                     
                 # Add the node to the `remove` list
                 remove_list.append(node_2_name)
@@ -1914,7 +1940,7 @@ class FEModel3D():
         # Return the global displacement vector
         return self._D[combo_name]
 
-    def analyze(self, log=False, check_stability=True, check_statics=False, max_iter=30, sparse=True, combo_tags=None):
+    def analyze(self, log=False, check_stability=True, check_statics=False, max_iter=30, sparse=True, combo_tags:list=None,load_combos:list=None):
         """Performs first-order static analysis. Iterations are performed if tension-only members or compression-only members are present.
 
         :param log: Prints the analysis log to the console if set to True. Default is False.
@@ -1947,7 +1973,7 @@ class FEModel3D():
         D1_indices, D2_indices, D2 = Analysis._partition_D(self)
 
         # Identify which load combinations have the tags the user has given
-        combo_list = Analysis._identify_combos(self, combo_tags)
+        combo_list = Analysis._identify_combos(self, combo_tags,load_combos)
 
         # Step through each load combination
         for combo in combo_list:
@@ -2031,7 +2057,7 @@ class FEModel3D():
         # Flag the model as solved
         self.solution = 'Linear TC'
 
-    def analyze_linear(self, log=False, check_stability=True, check_statics=False, sparse=True, combo_tags=None):
+    def analyze_linear(self, log=False, check_stability=True, check_statics=False, sparse=True, combo_tags:list=None,load_combos:list=None):
         """Performs first-order static analysis. This analysis procedure is much faster since it only assembles the global stiffness matrix once, rather than once for each load combination. It is not appropriate when non-linear behavior such as tension/compression only analysis or P-Delta analysis are required.
 
         :param log: Prints the analysis log to the console if set to True. Default is False.
@@ -2069,7 +2095,7 @@ class FEModel3D():
             K11, K12, K21, K22 = Analysis._partition(self, self.K(combo_name, log, check_stability, sparse), D1_indices, D2_indices)
 
         # Identify which load combinations have the tags the user has given
-        combo_list = Analysis._identify_combos(self, combo_tags)
+        combo_list = Analysis._identify_combos(self, combo_tags,load_combos)
 
         # Step through each load combination
         for combo in combo_list:
@@ -2123,7 +2149,7 @@ class FEModel3D():
         # Flag the model as solved
         self.solution = 'Linear'
 
-    def analyze_PDelta(self, log=False, check_stability=True, max_iter=30, sparse=True, combo_tags=None):
+    def analyze_PDelta(self, log=False, check_stability=True, max_iter=30, sparse=True, combo_tags:list=None,load_combos:list=None):
         """Performs second order (P-Delta) analysis. This type of analysis is appropriate for most models using beams, columns and braces. Second order analysis is usually required by material specific codes. The analysis is iterative and takes longer to solve. Models with slender members and/or members with combined bending and axial loads will generally have more significant P-Delta effects. P-Delta effects in plates/quads are not considered.
 
         :param log: Prints updates to the console if set to True. Default is False.
@@ -2154,7 +2180,7 @@ class FEModel3D():
         D1_indices, D2_indices, D2 = Analysis._partition_D(self)
 
         # Identify which load combinations have the tags the user has given
-        combo_list = Analysis._identify_combos(self, combo_tags)
+        combo_list = Analysis._identify_combos(self, combo_tags,load_combos)
 
         # Step through each load combination
         for combo in combo_list:
@@ -2179,7 +2205,7 @@ class FEModel3D():
         # Flag the model as solved
         self.solution = 'P-Delta'
     
-    def _not_ready_yet_analyze_pushover(self, log=False, check_stability=True, push_combo='Push', max_iter=30, tol=0.01, sparse=True, combo_tags=None):
+    def _not_ready_yet_analyze_pushover(self, log=False, check_stability=True, push_combo='Push', max_iter=30, tol=0.01, sparse=True, combo_tags:list=None,load_combos:list=None):
 
         if log:
             print('+---------------------+')
@@ -2210,7 +2236,7 @@ class FEModel3D():
 
         # Identify which load combinations have the tags the user has given
         # TODO: Remove the pushover combo istelf from `combo_list`
-        combo_list = Analysis._identify_combos(self, combo_tags)
+        combo_list = Analysis._identify_combos(self, combo_tags,load_combos)
         combo_list = [combo for combo in combo_list if combo.name != push_combo]
 
         # Step through each load combination
