@@ -1,7 +1,7 @@
 from math import isclose
 from PyNite.LoadCombo import LoadCombo
 from numpy import array, atleast_2d, zeros, subtract, matmul, divide, seterr, nanmax
-from numpy.linalg import solve
+from PyNite.Solvers import solve
 
 def _prepare_model(model):
     """Prepares a model for analysis by ensuring at least one load combination is defined, generating all meshes that have not already been generated, activating all non-linear members, and internally numbering all nodes and elements.
@@ -147,7 +147,7 @@ def _PDelta_step(model, combo_name, P1, FER1, D1_indices, D2_indices, D2, log=Tr
 
     # Import `scipy` features if the sparse solver is being used
     if sparse == True:
-        from scipy.sparse.linalg import spsolve
+        from PyNite.Solvers import spsolve
 
     iter_count_TC = 1    # Tracks tension/compression-only iterations
     iter_count_PD = 1    # Tracks P-Delta iterations
