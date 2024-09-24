@@ -47,6 +47,7 @@ class Test_AISC_Benchmark(unittest.TestCase):
         nu = 0.3
         rho = 0.490  # kcf
         cantilever.add_material('Steel', E, G, nu, rho)
+        cantilever.add_section('BeamSection', 10/12**2, I, I, 200/12**4)
 
         # Add nodes along the length of the column to capture P-little-delta effects
         num_nodes = 6
@@ -55,7 +56,7 @@ class Test_AISC_Benchmark(unittest.TestCase):
             cantilever.add_node('N' + str(i+1), 0, i*L/(num_nodes - 1), 0)
         
         # Add the member
-        cantilever.add_member('M1', 'N1', 'N6', 'Steel', I, I, 200/12**4, 10/12**2)
+        cantilever.add_member('M1', 'N1', 'N6', 'Steel', 'BeamSection')
 
         # Add a fixed support at the base of the column
         cantilever.def_support('N1', True, True, True, True, True, True)
@@ -118,8 +119,9 @@ class Test_AISC_Benchmark(unittest.TestCase):
         Iz = 484/12**4   # ft^4
         A = 14.1/12**2   # ft^2
         J = 1.45/12**4   # ft^4
+        column.add_section('ColumnSection', A, Iy, Iz, J)
 
-        column.add_member('M1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
+        column.add_member('M1', 'N1', 'N2', 'Steel', 'ColumnSection')
         
         column.add_member_dist_load('M1', 'Fy', -0.200, -0.200, case='P1')
         column.add_member_dist_load('M1', 'Fy', -0.200, -0.200, case='P2')
@@ -183,8 +185,9 @@ class Test_AISC_Benchmark(unittest.TestCase):
         Iz = 484/12**4   # ft^4
         A = 14.1/12**2   # ft^2
         J = 1.45/12**4   # ft^4
+        column.add_section('ColumnSection', A, Iy, Iz, J)
 
-        column.add_member('M1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
+        column.add_member('M1', 'N1', 'N2', 'Steel', 'ColumnSection')
         
         column.add_node_load('N2', 'FX', 1, case='P1')
         column.add_node_load('N2', 'FX', 1, case='P2')

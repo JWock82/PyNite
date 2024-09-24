@@ -28,7 +28,8 @@ class TestLoads(unittest.TestCase):
         cont_beam.add_node('N2', 15, 0, 0)
         cont_beam.add_node('N3', 30, 0, 0)
         cont_beam.add_material('Steel', 29000*144, 11200*144, 0.3, 0.490)
-        cont_beam.add_member('M1', 'N1', 'N3', 'Steel', 23.3/12**4, 340/12**4, 0.569/12**4, 10/12**2)  # W14x34
+        cont_beam.add_section('Section', 10/12**2, 23.3/12**4, 340/12**4, 0.569/12**4)
+        cont_beam.add_member('M1', 'N1', 'N3', 'Steel', 'Section')  # W14x34
         cont_beam.def_support('N1', True, True, True, True, False, False)
         cont_beam.def_support('N2', False, True, True, False, False, False)
         cont_beam.def_support('N3', False, True, True, False, False, False)
@@ -61,7 +62,8 @@ class TestLoads(unittest.TestCase):
         Iz = 0.003125 # m^4
         J = 1
         A = 0.15 # m^2
-        Beam.add_member("M1", "N1", "N2", 'Mat1', Iy, Iz, J, A)
+        Beam.add_section('Section', A, Iy, Iz, J)
+        Beam.add_member("M1", "N1", "N2", 'Mat1', 'Section')
 
         # Supports
         Beam.def_support("N1", True, True, True, True, True, True)

@@ -23,8 +23,9 @@ for i in range(num_nodes):
     # Add nodes
     cantilever.add_node('N' + str(i+1), 0, i*L/(num_nodes - 1), 0)
 
-# Add the member
-cantilever.add_member('M1', 'N1', 'N6', 'Steel', I, I, 200/12**4, 10/12**2)
+# Add the section and member
+cantilever.add_section('MySection', 10/12**2, I, I, 200/12**4)
+cantilever.add_member('M1', 'N1', 'N6', 'Steel',  'MySection')
 
 # Add a fixed support at the base of the column
 cantilever.def_support('N1', True, True, True, True, True, True)

@@ -18,6 +18,7 @@ Iy = 36.6 # in^4
 Iz = 171 # in^4
 J = 0.58 # in^4
 A = 9.71 # in^2
+MomentFrame.add_section('W10x33', A, Iy, Iz, J)
 
 # Define a material
 E = 29000 # ksi
@@ -27,17 +28,18 @@ rho = 0.490/12**3  # Density (kci)
 MomentFrame.add_material('Steel', E, G, nu, rho)
 
 # Define the columns
-MomentFrame.add_member('Col1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
-MomentFrame.add_member('Col2', 'N4', 'N3', 'Steel', Iy, Iz, J, A)
+MomentFrame.add_member('Col1', 'N1', 'N2', 'Steel', 'W10x33')
+MomentFrame.add_member('Col2', 'N4', 'N3', 'Steel', 'W10x33')
 
 # Define beam properties (Use W8x24)
 Iy = 18.3 # in^4
 Iz = 82.7 # in^4
 J = 0.346 # in^4
 A = 7.08 # in^2
+MomentFrame.add_section('W8x24', A, Iy, Iz, J)
 
 # Define the beams
-MomentFrame.add_member('Beam', 'N2', 'N3', 'Steel', Iy, Iz, J, A)
+MomentFrame.add_member('Beam', 'N2', 'N3', 'Steel', 'W8x24')
 
 # Provide fixed supports at the bases of the columns
 MomentFrame.def_support('N1', support_DX=True, support_DY=True, support_DZ=True, support_RX=True, support_RY=True, support_RZ=True)

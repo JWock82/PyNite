@@ -15,8 +15,7 @@ fy = 50  # ksi
 plastic_beam.add_material('Stl_A992', E, G, nu, rho, fy)
 
 # Define a cross-section
-W12 = SteelSection(plastic_beam, 'W12x65', 19.1, 20, 533, 1, 15, 96.8, 'Stl_A992')
-plastic_beam.add_section('W12x65', W12)
+plastic_beam.add_steel_section('W12x65', 19.1, 20, 533, 1, 15, 96.8, 'Stl_A992')
 
 # Add nodes
 plastic_beam.add_node('N1', 0, 0, 0)
@@ -28,7 +27,7 @@ plastic_beam.def_support('N1', True, True, True, True, True, True)
 plastic_beam.def_support('N3', False, True, True, False, False, False)
 
 # Add a member
-plastic_beam.add_member('M1', 'N1', 'N3', 'Stl_A992', section_name='W12x65')
+plastic_beam.add_member('M1', 'N1', 'N3', 'Stl_A992', 'W12x65')
 
 # Add a load
 plastic_beam.add_node_load('N3', 'FY', -0.0001, 'D')

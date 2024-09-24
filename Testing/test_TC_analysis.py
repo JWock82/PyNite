@@ -41,9 +41,10 @@ class Test_2D_Frame(unittest.TestCase):
         Iz = 3 # in^4
         J = 0.0438 # in^4
         A = 1.94 # in^2
+        tc_model.add_section('Section', A, Iy, Iz, J)
 
-        tc_model.add_member('both-ways', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
-        tc_model.add_member('t-only top', 'N3', 'N2', 'Steel', Iy, Iz, J, A, tension_only=True)
+        tc_model.add_member('both-ways', 'N1', 'N2', 'Steel', 'Section')
+        tc_model.add_member('t-only top', 'N3', 'N2', 'Steel', 'Section', tension_only=True)
         tc_model.def_releases('t-only top', Ryi=True, Rzi=True, Ryj=True, Rzj=True)
         tc_model.def_releases('both-ways', Ryi=True, Rzi=True, Ryj=True, Rzj=True)
 
@@ -53,7 +54,7 @@ class Test_2D_Frame(unittest.TestCase):
         tc_model.def_support('N4', *[True]*6)
         tc_model.add_node_load('N2', 'FY', -10)
 
-        tc_model.add_member('t-only bott', 'N4', 'N2', 'Steel', Iy, Iz, J, A, tension_only=True)
+        tc_model.add_member('t-only bott', 'N4', 'N2', 'Steel', 'Section', tension_only=True)
         tc_model.def_releases('t-only bott', Ryi=True, Rzi=True, Ryj=True, Rzj=True)
 
         tc_model.analyze()

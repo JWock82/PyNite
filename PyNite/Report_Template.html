@@ -67,12 +67,12 @@
                     <td>{{ member.name }}</td>
                     <td>{{ member.i_node.name }}</td>
                     <td>{{ member.j_node.name }}</td>
-                    <td>{{ "%.4g" | format(member.A) }}</td>
-                    <td>{{ "%.4g" | format(member.Iy) }}</td>
-                    <td>{{ "%.4g" | format(member.Iz) }}</td>
-                    <td>{{ "%.4g" | format(member.J) }}</td>
-                    <td>{{ "%.4g" | format(member.E) }}</td>
-                    <td>{{ "%.4g" | format(member.G) }}</td>
+                    <td>{{ "%.4g" | format(member.section.A) }}</td>
+                    <td>{{ "%.4g" | format(member.section.Iy) }}</td>
+                    <td>{{ "%.4g" | format(member.section.Iz) }}</td>
+                    <td>{{ "%.4g" | format(member.section.J) }}</td>
+                    <td>{{ "%.4g" | format(member.material.E) }}</td>
+                    <td>{{ "%.4g" | format(member.material.G) }}</td>
                 </tr>
             {% endfor %}
             </tbody>

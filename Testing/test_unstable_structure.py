@@ -40,12 +40,14 @@ class Test_Unstable(unittest.TestCase):
 
         # Add columns with the following properties:
         # Iy = 100 in^4, Iz = 150 in^4, J = 250 in^4, A = 10 in^2
-        MomentFrame.add_member("M1", "N1", "N2", 'Steel', 100, 150, 250, 10)
-        MomentFrame.add_member("M2", "N4", "N3", 'Steel', 100, 150, 250, 10)
+        MomentFrame.add_section('Section', 10, 100, 150, 250)
+        MomentFrame.add_member("M1", "N1", "N2", 'Steel', 'Section')
+        MomentFrame.add_member("M2", "N4", "N3", 'Steel', 'Section')
 
         # Add a beam with the following properties:
         # Iy = 100 in^4, Iz = 250 in^4, J = 250 in^4, A = 15 in^2
-        MomentFrame.add_member("M3", "N2", "N3", 'Steel', 100, 250, 250, 15)
+        MomentFrame.add_section('Section2', 15, 100, 250, 250)
+        MomentFrame.add_member("M3", "N2", "N3", 'Steel', 'Section2')
 
         # Pin the ends of the columns
         MomentFrame.def_releases('M1', Dzi=True)

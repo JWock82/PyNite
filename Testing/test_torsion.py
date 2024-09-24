@@ -29,8 +29,10 @@ class Test_End_Release(unittest.TestCase):
         TorqueBeam.add_node('N2', 168, 0, 0)
         # Add a material
         TorqueBeam.add_material('Steel', 29000, 11400, 0.5, 490/1000/12**3)
+        #Add section
+        TorqueBeam.add_section('Section', 20, 100, 150, 250)
         # Add a beam with the following properties:
-        TorqueBeam.add_member('M1', 'N1', 'N2', 'Steel', 100, 150, 250, 20)
+        TorqueBeam.add_member('M1', 'N1', 'N2', 'Steel', 'Section')
         # Provide fixed supports
         TorqueBeam.def_support('N1', False, True, True, True, True, True)
         TorqueBeam.def_support('N2', True, True, True, True, True, True)

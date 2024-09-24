@@ -22,8 +22,8 @@ class Member3D():
     __plt = None
 
 #%%
-    def __init__(self, name, i_node, j_node, material_name, model, Iy, Iz, J, A, auxNode=None,
-                 tension_only=False, comp_only=False, section_name=None):
+    def __init__(self, model, name, i_node, j_node, material_name, section_name, auxNode=None,
+                 tension_only=False, comp_only=False):
         """
         Initializes a new member.
         """
@@ -31,23 +31,16 @@ class Member3D():
         self.ID = None        # Unique index number for the member assigned by the program
         self.i_node = i_node  # The element's i-node
         self.j_node = j_node  # The element's j-node
-        self.material_name = material_name  # The element's material
-        self.E = model.materials[material_name].E   # The modulus of elasticity of the element
-        self.G = model.materials[material_name].G   # The shear modulus of the element
 
-        # Section properties
-        if section_name is None:
-            self.section = None
-            self.A = A            # The cross-sectional area
-            self.Iy = Iy          # The y-axis moment of inertia
-            self.Iz = Iz          # The z-axis moment of inertia
-            self.J = J            # The torsional constant
-        else:
-            self.section = model.sections[section_name]
-            self.A = model.sections[section_name].A
-            self.Iy = model.sections[section_name].Iy
-            self.Iz = model.sections[section_name].Iz
-            self.J = model.sections[section_name].J
+        try:
+            self.material = model.materials[material_name] # The element's material
+        except KeyError:
+            raise NameError(f"No material named '{material_name}'")
+        
+        try:
+            self.section = model.sections[section_name] # The element's section
+        except KeyError:
+            raise NameError(f"No section names '{section_name}'")
         
         # Variables used to track nonlinear material member end forces
         self._fxi = 0
@@ -145,12 +138,12 @@ class Member3D():
         """
 
         # Get the properties needed to form the local stiffness matrix
-        E = self.E
-        G = self.G
-        Iy = self.Iy
-        Iz = self.Iz
-        J = self.J
-        A = self.A
+        E = self.material.E
+        G = self.material.G
+        Iy = self.section.Iy
+        Iz = self.section.Iz
+        J = self.section.J
+        A = self.section.A
         L = self.L()
         
         # Create the uncondensed local stiffness matrix
@@ -182,8 +175,8 @@ class Member3D():
         """
 
         # Get the properties needed to form the local geometric stiffness matrix
-        Ip = self.Iy + self.Iz
-        A = self.A
+        Ip = self.section.Iy + self.section.Iz
+        A = self.section.A
         L = self.L()
         
         # Create the uncondensed local geometric stiffness matrix
@@ -465,7 +458,7 @@ class Member3D():
         # Calculate and return the member's local end force vector
         if self.model.solution == 'P-Delta':
             # Back-calculate the axial force on the member from the axial strain
-            P = (self.d(combo_name)[6, 0] - self.d(combo_name)[0, 0])*self.A*self.E/self.L()
+            P = (self.d(combo_name)[6, 0] - self.d(combo_name)[0, 0])*self.section.A*self.material.E/self.L()
             return add(matmul(add(self.k(), self.kg(P)), self.d(combo_name)), self.fer(combo_name))
         elif self.model.solution == 'Pushover':
             P = self._fxj - self._fxi
@@ -1907,10 +1900,10 @@ class Member3D():
         
         # Get the member's length and stiffness properties
         L = self.L()
-        E = self.E
-        A = self.A
-        Iz = self.Iz
-        Iy = self.Iy
+        E = self.material.E
+        A = self.section.A
+        Iz = self.section.Iz
+        Iy = self.section.Iy
         SegmentsZ = self.SegmentsZ
         SegmentsY = self.SegmentsY
         SegmentsX = self.SegmentsX

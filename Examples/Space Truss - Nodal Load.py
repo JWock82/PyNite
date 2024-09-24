@@ -30,14 +30,16 @@ nu = 0.3
 rho = 1
 truss.add_material('Rigid', E, G, nu, rho)
 
+#Add a section to use for all members in this model
+truss.add_section('TrussSection', 100, 100, 100, 100)
 
 # Create members
-truss.add_member('AB', 'A', 'B', 'Rigid', 100, 100, 100, 100)
-truss.add_member('AC', 'A', 'C', 'Rigid', 100, 100, 100, 100)
-truss.add_member('AD', 'A', 'D', 'Rigid', 100, 100, 100, 100)
-truss.add_member('BC', 'B', 'C', 'Rigid', 100, 100, 100, 100)
-truss.add_member('BD', 'B', 'D', 'Rigid', 100, 100, 100, 100)
-truss.add_member('BE', 'B', 'E', 'Rigid', 100, 100, 100, 100)
+truss.add_member('AB', 'A', 'B', 'Rigid', 'TrussSection')
+truss.add_member('AC', 'A', 'C', 'Rigid', 'TrussSection')
+truss.add_member('AD', 'A', 'D', 'Rigid', 'TrussSection')
+truss.add_member('BC', 'B', 'C', 'Rigid', 'TrussSection')
+truss.add_member('BD', 'B', 'D', 'Rigid', 'TrussSection')
+truss.add_member('BE', 'B', 'E', 'Rigid', 'TrussSection')
 
 # Release the moments at the ends of the members to make truss members
 truss.def_releases('AC', False, False, False, False, True, True, \

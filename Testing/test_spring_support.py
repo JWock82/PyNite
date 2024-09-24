@@ -52,12 +52,13 @@ class Test_Spring_Supports(unittest.TestCase):
         Iz = 128.5  # in^4 (strong axis)
         Iy = 42.6   # in^4 (weak axis)
         J = 0.769   # in^4
+        boef.add_section('Section', A, Iy, Iz, J)
 
         # Define members
         for i in range(16):
 
             # Add the members
-            boef.add_member('M' + str(i + 1), 'N' + str(i + 1), 'N' + str(i + 2), 'Steel', Iy, Iz, J, A)
+            boef.add_member('M' + str(i + 1), 'N' + str(i + 1), 'N' + str(i + 2), 'Steel', 'Section')
         
         # Add a point load at midspan
         boef.add_node_load('N9', 'FY', -40)

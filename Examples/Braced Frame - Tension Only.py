@@ -18,6 +18,7 @@ Iy = 36.6 # in^4
 Iz = 171 # in^4
 J = 0.58 # in^4
 A = 9.71 # in^2
+braced_frame.add_section('W10x33', A, Iy, Iz, J)
 
 # Define a material
 E = 29000 # ksi
@@ -27,17 +28,18 @@ rho = 0.490/12**2  # Density (kci)
 braced_frame.add_material('Steel', E, G, nu, rho)
 
 # Define the columns
-braced_frame.add_member('Col1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
-braced_frame.add_member('Col2', 'N4', 'N3', 'Steel', Iy, Iz, J, A)
+braced_frame.add_member('Col1', 'N1', 'N2', 'Steel', 'W10x33')
+braced_frame.add_member('Col2', 'N4', 'N3', 'Steel', 'W10x33')
 
 # Define beam properties (Use W8x24)
 Iy = 18.3 # in^4
 Iz = 82.7 # in^4
 J = 0.346 # in^4
 A = 7.08 # in^2
+braced_frame.add_section('W8x24', A, Iy, Iz, J)
 
 # Define the beams
-braced_frame.add_member('Beam', 'N2', 'N3', 'Steel', Iy, Iz, J, A)
+braced_frame.add_member('Beam', 'N2', 'N3', 'Steel', 'W8x24')
 braced_frame.def_releases('Beam', Ryi=True, Rzi=True, Ryj=True, Rzj=True)
 
 # Define the brace properties
@@ -47,12 +49,11 @@ Iy = 3 # in^4
 Iz = 3 # in^4
 J = 0.0438 # in^4
 A = 1.94 # in^2
+braced_frame.add_section('L4x4x1/4', A, Iy, Iz, J)
 
 # Define the braces
-braced_frame.add_member('Brace1', 'N1', 'N3', 'Steel', Iy, Iz, J, A,
-                      tension_only=True)
-braced_frame.add_member('Brace2', 'N4', 'N2', 'Steel', Iy, Iz, J, A,
-                      tension_only=True)
+braced_frame.add_member('Brace1', 'N1', 'N3', 'Steel', 'L4x4x1/4', tension_only=True)
+braced_frame.add_member('Brace2', 'N4', 'N2', 'Steel', 'L4x4x1/4', tension_only=True)
 
 # Release the brace ends to form an axial member
 braced_frame.def_releases('Brace1', Ryi=True, Rzi=True, Ryj=True, Rzj=True)

@@ -46,10 +46,11 @@ class Test_Support_Settlement(unittest.TestCase):
         Iy = 1000
         Iz = 7800
         J = 8800
+        beam.add_section('Section', A, Iy, Iz, J)
 
-        beam.add_member('AB', 'A', 'B', 'Steel', Iy, Iz, J, A)
-        beam.add_member('BC', 'B', 'C', 'Steel', Iy, Iz, J, A)
-        beam.add_member('CD', 'C', 'D', 'Steel', Iy, Iz, J, A)
+        beam.add_member('AB', 'A', 'B', 'Steel', 'Section')
+        beam.add_member('BC', 'B', 'C', 'Steel', 'Section')
+        beam.add_member('CD', 'C', 'D', 'Steel', 'Section')
 
         # Provide supports
         beam.def_support('A', True, True, True, True, False, False)

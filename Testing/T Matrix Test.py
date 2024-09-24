@@ -26,15 +26,24 @@ truss.def_support('e', True, True, True, True, True, True)
 # Define properties common to all members
 E = 200000000  # kN/m^2
 G = 0.4*E
+truss.add_material('Steel',E, G, 0.3, 78.5)
+
+#Define some section properties
 J = 100
 Iy = 100
 Iz = 100
 
 # Define members
-truss.add_member('ab', 'a', 'b', E, G, Iy, Iz, J, 20*10**3/1000**2)
-truss.add_member('ac', 'a', 'c', E, G, Iy, Iz, J, 30*10**3/1000**2)
-truss.add_member('ad', 'a', 'd', E, G, Iy, Iz, J, 40*10**3/1000**2)
-truss.add_member('ae', 'a', 'e', E, G, Iy, Iz, J, 30*10**3/1000**2)
+truss.add_section('TrussSection1', 20*10**3/1000**2, Iy, Iz, J)
+truss.add_member('ab', 'a', 'b', 'Steel', 'TrussSection1')
+
+truss.add_section('TrussSection2', 30*10**3/1000**2, Iy, Iz, J)
+truss.add_member('ac', 'a', 'c', 'Steel', 'TrussSection2')
+
+truss.add_section('TrussSection3', 40*10**3/1000**2, Iy, Iz, J)
+truss.add_member('ad', 'a', 'd', 'Steel', 'TrussSection3')
+
+truss.add_member('ae', 'a', 'e', 'Steel', 'TrussSection2')
 
 # Define member end releases
 truss.def_releases('ab', False, False, False, False, True, True,

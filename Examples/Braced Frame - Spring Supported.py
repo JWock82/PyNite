@@ -13,11 +13,12 @@ braced_frame.add_node('N2', 0, 12*12, 0)
 braced_frame.add_node('N3', 15*12, 12*12, 0)
 braced_frame.add_node('N4', 15*12, 0*12, 0)
 
-# Define column properties (use W10x33 from the AISC Manual):
+# Define column properties (use W10x33 from the AISC Manual) and add section to the model:
 Iy = 36.6 # in^4
 Iz = 171  # in^4
 J = 0.58  # in^4
 A = 9.71  # in^2
+braced_frame.add_section('W10x33', A, Iy, Iz, J)
 
 # Define a material
 E = 29000 # Young's modulus (ksi)
@@ -27,29 +28,31 @@ rho = 0.490/12**2  # Density (kci)
 braced_frame.add_material('Steel', E, G, nu, rho)
 
 # Define the columns
-braced_frame.add_member('Col1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
-braced_frame.add_member('Col2', 'N4', 'N3', 'Steel', Iy, Iz, J, A)
+braced_frame.add_member('Col1', 'N1', 'N2', 'Steel', 'W10x33')
+braced_frame.add_member('Col2', 'N4', 'N3', 'Steel', 'W10x33')
 
-# Define beam properties (Use W8x24)
+# Define beam properties (Use W8x24) and add section to the model
 Iy = 18.3 # in^4
 Iz = 82.7 # in^4
 J = 0.346 # in^4
 A = 7.08 # in^2
+braced_frame.add_section('W8x24', A, Iy, Iz, J)
 
 # Define the beams
-braced_frame.add_member('Beam', 'N2', 'N3', 'Steel', Iy, Iz, J, A)
+braced_frame.add_member('Beam', 'N2', 'N3', 'Steel', 'W8x24')
 braced_frame.def_releases('Beam', Ryi=True, Rzi=True, Ryj=True, Rzj=True)
 
 # Define the brace properties
 # We'll use a section with L/r <= 300 which is a common rule of thumb for
-# tension members. We'll use L4x4x1/4.
+# tension members. We'll use L4x4x1/4. 
 Iy = 3 # in^4
 Iz = 3 # in^4
 J = 0.0438 # in^4
 A = 1.94 # in^2
+braced_frame.add_section('L4x4x1/4', A, Iy, Iz, J)
 
 # Define a brace (tension and compression - both ways)
-braced_frame.add_member('Brace1', 'N1', 'N3', 'Steel', Iy, Iz, J, A)
+braced_frame.add_member('Brace1', 'N1', 'N3', 'Steel', 'L4x4x1/4')
 
 # Let's add spring supports to the base of the structure. We'll add a couple of
 # extra nodes at the base of the structure that will receive the springs. The

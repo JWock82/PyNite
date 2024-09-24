@@ -38,14 +38,16 @@ E = 29000   # ksi
 G = 11200   # ksi
 boef.add_material('Steel', E, G, 0.3, 490/1000/12**3)
 
-# Define section properties (W8x35)
+# Define section properties (W8x35) and add a section to the model
 A = 10.3    # in^2
 Iz = 127    # in^4 (strong axis)
 Iy = 42.6   # in^4 (weak axis)
 J = 0.769   # in^4
 
+boef.add_section('W8x35', A, Iy, Iz, J)
+
 # Define the member
-boef.add_member('M1', 'N1', 'N' + str(num_nodes), 'Steel', Iy, Iz, J, A)
+boef.add_member('M1', 'N1', 'N' + str(num_nodes), 'Steel', 'W8x35')
 
 # In the next few lines no load case or load combination is being specified. When this is the case,
 # PyNite internally creates a default load case ('Case 1') and a default load combination

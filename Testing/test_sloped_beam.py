@@ -46,9 +46,10 @@ class Test_2D_Frame(unittest.TestCase):
         Iy = 200/12**4
         Iz = 200/12**4
         A = 12/12**2
+        beam.add_section('Section', A, Iy, Iz, J)
 
         # Create the beam
-        beam.add_member('M1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
+        beam.add_member('M1', 'N1', 'N2', 'Steel', 'Section')
         
         # Hinge the ends of the beam
         beam.def_releases('M1', False, False, False, False, True, True, False, False, False, False, True, True)

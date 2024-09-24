@@ -33,13 +33,14 @@ class Test_End_Release(unittest.TestCase):
         nu = 0.3
         rho = 0.490/12**3  # kci
         myModel.add_material('Steel', E, G, nu, rho)
+        myModel.add_section('ColumnSection', 10, 100, 150, 250)
 
         # Add two supported nodes and one member
         myModel.add_node('N1', 0, 0, 0)
         myModel.add_node('N2', 10*12, 0, 0)
         myModel.def_support('N1', True, True, True, True, True, True)
         myModel.def_support('N2', True, True, True, True, True, True)
-        myModel.add_member('M1', 'N1', 'N2', 'Steel', 100, 150, 250, 10)
+        myModel.add_member('M1', 'N1', 'N2', 'Steel', 'ColumnSection')
 
         # Release Rzi and Rzj on member M1
         myModel.def_releases('M1', False, False, False, False, False, True, \

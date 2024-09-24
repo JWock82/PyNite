@@ -50,11 +50,13 @@ class Test_2D_Frame(unittest.TestCase):
         Iy = 250
         Iz = 200
         A = 12
-        frame.add_member('M1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M2', 'N2', 'N3', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M3', 'N3', 'N4', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M4', 'N4', 'N5', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M5', 'N5', 'N6', 'Steel', Iy, Iz, J, A)
+        frame.add_section('FrameSection', A, Iy, Iz, J)
+
+        frame.add_member('M1', 'N1', 'N2', 'Steel', 'FrameSection')
+        frame.add_member('M2', 'N2', 'N3', 'Steel', 'FrameSection')
+        frame.add_member('M3', 'N3', 'N4', 'Steel', 'FrameSection')
+        frame.add_member('M4', 'N4', 'N5', 'Steel', 'FrameSection')
+        frame.add_member('M5', 'N5', 'N6', 'Steel', 'FrameSection')
 
         # Add nodal loads
         frame.add_node_load('N3', 'FY', -30)
@@ -99,16 +101,21 @@ class Test_2D_Frame(unittest.TestCase):
         Iz = 82.7/12**4     # ft^4
         J = 0.346/12**4     # ft^4
         A = 5.26/12**2      # in^2
+        frame.add_section('FrameSection', A, Iy, Iz, J)
+
         # Define members
-        frame.add_member('M1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M2', 'N2', 'N3', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M3', 'N4', 'N3', 'Steel', Iy, Iz, J, A)
+        frame.add_member('M1', 'N1', 'N2', 'Steel', 'FrameSection')
+        frame.add_member('M2', 'N2', 'N3', 'Steel', 'FrameSection')
+        frame.add_member('M3', 'N4', 'N3', 'Steel', 'FrameSection')
+
         # Add loads to the frame
         frame.add_member_pt_load('M2', 'Fy', -5, 7.75/2)       # 5 kips @ midspan
         frame.add_member_dist_load('M2', 'Fy', -0.024, -0.024) # W8x24 self-weight
+
         # Analyze the frame
         frame.analyze()
         calculated_RZ = frame.nodes['N1'].RZ['Combo 1']
+
         # Update the expected value to an appropriate precision
         expected_RZ = 0.00022794540510395617
         self.assertAlmostEqual(calculated_RZ/expected_RZ, 1.0, 2)
@@ -138,11 +145,14 @@ class Test_2D_Frame(unittest.TestCase):
         Iy = 250
         Iz = 200
         A = 12
-        frame.add_member('M1', 'N1', 'N2', 'Steel', Iz, Iy, J, A)
-        frame.add_member('M2', 'N2', 'N3', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M3', 'N3', 'N4', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M4', 'N4', 'N5', 'Steel', Iy, Iz, J, A)
-        frame.add_member('M5', 'N5', 'N6', 'Steel', Iz, Iy, J, A)
+        frame.add_section('FrameSection1', A, Iy, Iz, J)
+        frame.add_section('FrameSection2', A, Iz, Iy, J)
+
+        frame.add_member('M1', 'N1', 'N2', 'Steel', 'FrameSection2')
+        frame.add_member('M2', 'N2', 'N3', 'Steel', 'FrameSection1')
+        frame.add_member('M3', 'N3', 'N4', 'Steel', 'FrameSection1')
+        frame.add_member('M4', 'N4', 'N5', 'Steel', 'FrameSection1')
+        frame.add_member('M5', 'N5', 'N6', 'Steel', 'FrameSection2')
 
         # Add nodal loads
         frame.add_node_load('N3', 'FY', -30)
@@ -197,7 +207,9 @@ class Test_2D_Frame(unittest.TestCase):
         Iy = 100
         Iz = 150
         J = 250
-        SimpleBeam.add_member("M1", "N1", "N2", "Steel", Iy, Iz, J, A)
+        SimpleBeam.add_section('BeamSection', A, Iy, Iz, J)
+
+        SimpleBeam.add_member("M1", "N1", "N2", "Steel", 'BeamSection')
         # Provide simple supports
         SimpleBeam.def_support("N1", True, True, True, False, False, True)
         SimpleBeam.def_support("N2", True, True, True, False, False, False)
@@ -241,11 +253,12 @@ class Test_2D_Frame(unittest.TestCase):
         Iz = 204/12**4
         J = 0.3/12**4
         A = 7.65/12**2
+        frame.add_section('FrameSection', A, Iy, Iz, J)
 
-        frame.add_member('AC', 'A', 'C', 'Steel', Iy, Iz, J, A)
-        frame.add_member('BD', 'B', 'D', 'Steel', Iy, Iz, J, A)
-        frame.add_member('CE', 'C', 'E', 'Steel', Iy, Iz, J, A)
-        frame.add_member('ED', 'E', 'D', 'Steel', Iy, Iz, J, A)
+        frame.add_member('AC', 'A', 'C', 'Steel', 'FrameSection')
+        frame.add_member('BD', 'B', 'D', 'Steel', 'FrameSection')
+        frame.add_member('CE', 'C', 'E', 'Steel', 'FrameSection')
+        frame.add_member('ED', 'E', 'D', 'Steel', 'FrameSection')
 
         frame.def_support('A', support_DX=True, support_DY=True, support_DZ=True)
         frame.def_support('B', support_DX=True, support_DY=True, support_DZ=True)

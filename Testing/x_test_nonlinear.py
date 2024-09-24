@@ -33,8 +33,7 @@ class Test_End_Release(unittest.TestCase):
         plastic_beam.add_material('Stl_A992', E, G, nu, rho, fy)
 
         # Define a cross-section
-        W12 = SteelSection('W12x65', 19.1, 20, 533, 1, 15, 96.8, 'Stl_A992')
-        plastic_beam.add_section('W12x65', W12)
+        plastic_beam.add_steel_section('W12x65', 19.1, 20, 533, 1, 15, 96.8, 'Stl_A992')
 
         # Add nodes
         plastic_beam.add_node('N1', 0, 0, 0)
@@ -46,7 +45,7 @@ class Test_End_Release(unittest.TestCase):
         plastic_beam.def_support('N2', False, True, True, False, False, False)
         
         # Add a member
-        plastic_beam.add_member('M1', 'N1', 'N2', 'A992', section='W12x65')
+        plastic_beam.add_member('M1', 'N1', 'N2', 'A992', 'W12x65')
 
         # Add a load
         plastic_beam.add_node_load('N2', 'FY', 0.3, 'Push')

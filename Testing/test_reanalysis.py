@@ -41,13 +41,14 @@ class Test_2D_Frame(unittest.TestCase):
         Iy = 30*24**3/12
         J = Iz + Iy
         A = 24*30
+        beam.add_section('Section', A, Iy, Iz, J)
 
         # Define a material
         E = 57*(4500)**0.5
         G = 0.4*E
         beam.add_material('Concrete', E, G, 0.17, 0.150/12**2)
         
-        beam.add_member('M1', 'N1', 'N3', 'Concrete', Iy, Iz, J, A)
+        beam.add_member('M1', 'N1', 'N3', 'Concrete', 'Section')
 
         # Add a member load
         w = -0.100*(10*12)
@@ -60,7 +61,7 @@ class Test_2D_Frame(unittest.TestCase):
 
         # Change the moment of inertia to account for cracking
         Iz = 0.35*Iz
-        beam.members['M1'].Iz = Iz
+        beam.members['M1'].section.Iz = Iz
 
         beam.analyze()
 

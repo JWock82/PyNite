@@ -2,23 +2,41 @@
 import numpy as np
 
 class Section():
+    """
+    A class representing a section assigned to a Member3D element in a finite element model.
 
-    def __init__(self, model, name, A, Iy, Iz, J, material_name):
-        
+    This class stores all properties related to the geometry of the member
+    """
+    def __init__(self, model, name:str, A:float, Iy:float, Iz:float, J:float) -> None:
+        """
+        :param model: The finite element model to which this section belongs
+        :type model: FEModel3D
+        :param name: Name of the section
+        :type name: str
+        :param A: Cross-sectional area of the section
+        :type A: float
+        :param Iy: The second moment of area the section about the Y (minor) axis
+        :type Iy: float
+        :param Iz: The second moment of area the section about the Z (major) axis
+        :type Iz: float
+        :param J: The torsion constant of the section
+        :type J: float
+        """        
         self.model = model
         self.name = name
         self.A = A
         self.Iy = Iy
         self.Iz = Iz
         self.J = J
-        self.material_name = material_name
-        self.fy = model.materials[material_name].fy
     
     def Phi(self):
         pass
 
     def G(self, fx, my, mz):
-        """Returns the gradient to the yield surface at a given point using numerical differentiation. This is a default solution. For a better solution, overwrite this method with a more precies one in the material/shape specific child class that inherits from this class.
+        """
+        Returns the gradient to the yield surface at a given point using numerical differentiation.
+        This is a default solution. For a better solution, overwrite this method with a more precies
+        one in the material/shape specific child class that inherits from this class.
         """
         
         # Small increment for numerical differentiation
@@ -49,9 +67,13 @@ class SteelSection(Section):
         self.rz = (Iz/A)**0.5
         self.Zy = Zy
         self.Zz = Zz
+
+        self.material = model.materials[material_name]
     
     def Phi(self, fx, my, mz):
-        """A method used to determine whether the cross section is elastic or plastic. Values less than 1 indicate the section is elastic.
+        """
+        A method used to determine whether the cross section is elastic or plastic. 
+        Values less than 1 indicate the section is elastic.
 
         :param fx: Axial force divided by axial strength.
         :type fx: float
@@ -64,9 +86,9 @@ class SteelSection(Section):
         """
                 
         # Plastic strengths for material nonlinearity
-        Py = self.fy*self.A
-        Mpy = self.fy*self.Zy
-        Mpz = self.fy*self.Zz
+        Py = self.material.fy*self.A
+        Mpy = self.material.fy*self.Zy
+        Mpz = self.material.fy*self.Zz
 
         # Values for p, my, and mz based on actual loads
         p = fx/Py
@@ -90,9 +112,9 @@ class SteelSection(Section):
         """
         
         # Plastic strengths for material nonlinearity
-        Py = self.fy*self.A
-        Mpy = self.fy*self.Zy
-        Mpz = self.fy*self.Zz
+        Py = self.material.fy*self.A
+        Mpy = self.material.fy*self.Zy
+        Mpz = self.material.fy*self.Zz
 
         # Partial derivatives of Phi
         dPhi_dfx = 18*fx**5*my**2/(Mpy**2*Py**6) + 2*fx/Py**2 + 7.0*fx*mz**2/(Mpz**2*Py**2)

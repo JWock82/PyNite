@@ -29,9 +29,12 @@ Here's a simple example of how to analyze a simple beam. Many more examples are 
     rho = 2.836e-4  # Density (kci)
     beam.add_material('Steel', E, G, nu, rho)
 
-    # Add a beam with the following properties:
+    # Add a section with the following properties:
     # Iy = 100 in^4, Iz = 150 in^4, J = 250 in^4, A = 20 in^2
-    beam.add_member('M1', 'N1', 'N2', 'Steel', 100, 150, 250, 20)
+    my_model.add_section('MySection', 20, 100, 150, 250)
+
+    #Add a member
+    beam.add_member('M1', 'N1', 'N2', 'Steel', 'MySection')
 
     # Provide simple supports
     beam.def_support('N1', True, True, True, False, False, False)

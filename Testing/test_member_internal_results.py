@@ -45,6 +45,7 @@ class TestMemberInternalResults(unittest.TestCase):
         Iy = 200/12**4
         Iz = 200/12**4
         A = 12/12**2
+        beam.add_section('Section', A, Iy, Iz, J)
 
         # Define a material
         E = 29000*144  # ksf
@@ -54,7 +55,7 @@ class TestMemberInternalResults(unittest.TestCase):
         beam.add_material('Steel', E, G, nu, rho)
 
         # Create the beam
-        beam.add_member('M1', 'N1', 'N2', 'Steel', Iy, Iz, J, A)
+        beam.add_member('M1', 'N1', 'N2', 'Steel', 'Section')
 
         # Add a mid-span node
         beam.add_node('N3', 5, 0, 0)
